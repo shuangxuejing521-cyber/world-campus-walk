@@ -1,0 +1,69 @@
+name: "认领校园 · 캠퍼스 맡기 · Claim a campus"
+description: "Tell us which campus your team wants to build. 告诉我们你们想建哪所校园。"
+title: "[Claim] "
+labels: ["claim"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        After you submit this form we generate a walkable white-box model of your campus from OpenStreetMap and reply here with the files.
+        提交后，我们会用 OpenStreetMap 数据生成白模，并在这里回复文件。
+        제출하시면 OpenStreetMap 데이터로 화이트 모델을 만들어 여기에 답글로 보내 드립니다.
+  - type: input
+    id: university
+    attributes:
+      label: "University and campus · 学校与校区 · 대학과 캠퍼스"
+      placeholder: "e.g. University of Bologna, main campus"
+    validations:
+      required: true
+  - type: input
+    id: location
+    attributes:
+      label: "City and country, or a map link · 城市与国家，或地图链接"
+      placeholder: "e.g. Bologna, Italy / https://www.openstreetmap.org/..."
+    validations:
+      required: true
+  - type: input
+    id: team
+    attributes:
+      label: "Team name · 团队名称 · 팀 이름"
+      description: "A club, a class or just your own name."
+    validations:
+      required: true
+  - type: textarea
+    id: members
+    attributes:
+      label: "Names to credit · 署名 · 표기할 이름"
+      description: "One per line, exactly as they should appear on the campus page."
+    validations:
+      required: true
+  - type: dropdown
+    id: relation
+    attributes:
+      label: "Your link to this university · 你与该校的关系"
+      options:
+        - "Current student · 在读学生"
+        - "Staff or faculty · 教职员"
+        - "Alumni · 校友"
+        - "Other · 其他"
+    validations:
+      required: true
+  - type: input
+    id: tool
+    attributes:
+      label: "How you plan to build it (optional) · 打算用什么方式建（选填） · 제작 방식 (선택)"
+      description: "Any method is welcome: Blender, SketchUp, scanning, Minecraft, Unity, AI tools..."
+  - type: dropdown
+    id: start
+    attributes:
+      label: "Starting point · 起点 · 시작점"
+      options:
+        - "Send us an OpenStreetMap white-box · 给我们一份白模"
+        - "We start from scratch · 我们从零开始"
+  - type: checkboxes
+    id: agree
+    attributes:
+      label: "Agreement · 确认"
+      options:
+        - label: "We have read CONTRIBUTING.md and will publish our model under CC BY 4.0. 我们已阅读投稿指南，并同意以 CC BY 4.0 发布模型。"
+          required: true

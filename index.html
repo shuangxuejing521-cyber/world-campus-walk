@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>世界校园漫游</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a full-window 3D stage; one quiet panel on the left lists campuses, small controls sit at the edges. One night-sky world by choice, so a single theme. */
+:root{
+  color-scheme: dark;
+  --space:#0c1a26;
+  --panel:#12232f;
+  --line:#2b4354;
+  --ink:#eef3f1;
+  --muted:#9db0b8;
+  --gold:#f2b632;
+  --teal:#49c5b6;
+  --font-display:"Noto Serif SC","Noto Sans KR",Georgia,serif;
+  --font-body:"Noto Sans SC","Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--space);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.55;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+#stage{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lab{position:absolute;left:0;top:0;white-space:nowrap;font-size:12px;font-weight:700;padding:2px 7px;border-radius:3px;background:rgba(12,26,38,.82);color:var(--ink);will-change:transform}
+.lab.open{background:var(--gold);color:#201600}
+.lab.sel{background:var(--teal);color:#06211d}
+.lab.b{background:rgba(255,255,255,.9);color:#1b2a33}
+
+header{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:12px;padding:12px 16px;pointer-events:none;flex-wrap:wrap}
+header>*{pointer-events:auto}
+h1{font-family:var(--font-display);font-size:20px;margin:0;letter-spacing:.02em;text-wrap:balance;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+.ttl{display:flex;flex-direction:column;gap:2px}
+#tag{font-size:13px;color:var(--gold);font-weight:700;text-shadow:0 1px 6px rgba(0,0,0,.6)}
+body.campus #tag{display:none}
+.spacer{flex:1}
+.seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel)}
+.seg button{border:0;background:transparent;padding:6px 10px;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:#10202b;font-weight:700}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:6px 12px;font-size:13px;color:var(--ink)}
+.btn.primary{background:var(--gold);border-color:var(--gold);color:#201600;font-weight:700}
+
+#panel{position:absolute;left:16px;top:84px;width:310px;max-height:calc(100% - 96px);overflow:auto;background:rgba(18,35,47,.94);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px}
+#panel p{margin:0;color:var(--muted);font-size:13px}
+#panel h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0;font-weight:700}
+#count{font-size:12px;color:var(--muted)}
+#uniFilter{width:100%;font:inherit;font-size:14px;color:var(--ink);background:var(--space);border:1px solid var(--line);border-radius:6px;padding:7px 10px}
+ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+li.reg{font-size:11px;letter-spacing:.08em;color:var(--teal);font-weight:700;padding:8px 2px 0}
+li.uni{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:8px}
+li.uni.open{border-color:var(--gold)}
+li.uni.sel{border-color:var(--teal)}
+li.uni button.n{flex:1;min-width:0;background:none;border:0;padding:0;text-align:left}
+li.uni .n b{display:block;font-size:14px}
+li.uni .n span{font-size:12px;color:var(--muted)}
+.pill{font-size:11px;padding:2px 8px;border-radius:99px;border:1px solid var(--teal);color:var(--teal);background:none;white-space:nowrap}
+.spec{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:6px}
+.spec li{font-size:13px;color:var(--muted);padding-left:14px;position:relative}
+.spec li::before{content:"";position:absolute;left:0;top:.6em;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+#founder{border-top:1px solid var(--line);padding-top:12px;font-size:12px}
+#founder b{color:var(--ink)}
+#founder a{color:var(--teal)}
+
+#hud{position:absolute;left:16px;right:16px;bottom:16px;display:flex;align-items:flex-end;gap:12px;pointer-events:none}
+#hud>*{pointer-events:auto}
+#hint{background:rgba(18,35,47,.9);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:13px;max-width:480px}
+#near{font-weight:700;color:var(--gold)}
+#by{color:var(--muted);font-size:12px}
+#stick{width:112px;height:112px;border-radius:50%;border:1px solid var(--line);background:rgba(18,35,47,.7);position:relative;touch-action:none;flex:none}
+#knob{position:absolute;left:36px;top:36px;width:40px;height:40px;border-radius:50%;background:var(--ink);opacity:.85}
+#credit{position:absolute;right:16px;bottom:16px;font-size:11px;color:var(--muted);text-align:right;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.6);max-width:46%}
+body.campus #credit{bottom:auto;top:60px}
+#toast{position:absolute;left:50%;top:70px;transform:translateX(-50%);background:var(--ink);color:#10202b;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;display:none;max-width:calc(100% - 32px)}
+#err{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--panel);border:1px solid var(--line);padding:16px;border-radius:10px;display:none;max-width:320px}
+#dlgWrap{position:absolute;inset:0;background:rgba(6,14,20,.6);display:flex;align-items:center;justify-content:center;padding:16px}
+#dlg{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px;max-width:420px;width:100%;display:flex;flex-direction:column;gap:12px}
+#dlg h2{font-family:var(--font-display);font-size:18px;margin:0;text-wrap:balance}
+#dlg .who{color:var(--gold);font-weight:700}
+#dlg ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;color:var(--muted);font-size:14px}
+#dlg .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#dlg a.btn{text-decoration:none}
+[hidden]{display:none!important}
+@media (max-width:640px){
+  #panel{left:16px;right:16px;width:auto;top:auto;bottom:16px;max-height:46%}
+  body.globe #credit{display:none}
+  h1{font-size:17px}
+  #hint{font-size:12px}
+}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body class="globe">
+<canvas id="stage" aria-label="3D"></canvas>
+<div id="labels"></div>
+
+<header>
+  <button class="btn" id="back" hidden data-t="back" type="button"></button>
+  <div class="ttl"><h1 id="title"></h1><div id="tag" data-t="tag"></div></div>
+  <div class="spacer"></div>
+  <div class="seg" id="modeSeg" hidden role="group">
+    <button id="mWalk" type="button" aria-pressed="true" data-t="walk"></button>
+    <button id="mAir" type="button" aria-pressed="false" data-t="air"></button>
+  </div>
+  <div class="seg" id="langSeg" role="group" aria-label="Language">
+    <button type="button" data-l="zh">中文</button><button type="button" data-l="ko">한국어</button><button type="button" data-l="en">EN</button>
+  </div>
+</header>
+
+<aside id="panel">
+  <p data-t="intro"></p>
+  <h2 data-t="campuses"></h2>
+  <div id="count"></div>
+  <input id="uniFilter" type="search" autocomplete="off">
+  <ul id="uniList"></ul>
+  <div class="spec">
+    <h2 data-t="joinH"></h2>
+    <ul>
+      <li data-t="join1"></li>
+      <li data-t="join2"></li>
+      <li data-t="join3"></li>
+    </ul>
+  </div>
+  <p id="founder"></p>
+</aside>
+
+<div id="hud" hidden>
+  <div id="stick" aria-hidden="true"><div id="knob"></div></div>
+  <div id="hint"><div id="near"></div><div id="hintText"></div><div id="by"></div></div>
+</div>
+<div id="credit" data-t="credit"></div>
+<div id="toast" role="status"></div>
+<div id="err" data-t="err"></div>
+<div id="dlgWrap" hidden>
+  <div id="dlg" role="dialog" aria-modal="true" aria-labelledby="dlgH">
+    <h2 id="dlgH" data-t="claimH"></h2>
+    <div class="who" id="dlgWho"></div>
+    <ol><li data-t="claim1"></li><li data-t="claim2"></li><li data-t="claim3"></li></ol>
+    <div class="row"><a class="btn primary" id="dlgRepo" target="_blank" rel="noopener" data-t="repoBtn"></a><button class="btn" id="dlgClose" type="button" data-t="close"></button></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+"use strict";
+/* ---------- site settings ---------- */
+const SITE={founder:"shuangxuejing521-cyber",repo:"https://github.com/shuangxuejing521-cyber/world-campus-walk"};
+
+/* ---------- text ---------- */
+const T={
+ zh:{title:"世界校园漫游",tag:"你的校园，由你来建。让世界看见你们的水平。",back:"← 返回地球",walk:"步行",air:"俯瞰",
+  intro:"每所大学的校园都由它自己的学生来建，用什么方式建都可以。现在可以走进的是韩国外国语大学的示范白模；其他学校，等你们来建。",
+  campuses:"校园",enter:"进入",claim:"认领",find:"搜索大学或城市",none:"没有找到这所学校",count:"已收录 {n} 所，可以走进去的 {o} 所",
+  joinH:"加入你的学校",join1:"用任何方式建：手工建模、扫描、Minecraft、游戏引擎都可以",join2:"交来模型文件，最好是 GLB，其他格式我们帮忙转换",join3:"校园页面署上你们团队的名字，并以 CC BY 授权公开",
+  hintWalk:"拖动画面环顾。W A S D 或方向键行走，按住 Shift 加速。",hintTouch:"左下摇杆行走，拖动画面环顾。",hintAir:"拖动旋转，滚轮或双指缩放。",
+  near:"附近：",byOsm:"白模由 OpenStreetMap 数据自动生成，等待团队认领完善。",
+  credit:"建筑与道路数据 © OpenStreetMap 贡献者 · 白模原型，楼高按层数估算",err:"这台设备无法显示 3D 画面（WebGL 不可用）。",
+  founder:"创始人",indep:"个人发起的开放项目，与文中任何大学无官方关系。",
+  claimH:"认领这所校园",claim1:"在 GitHub 仓库里填写“认领校园”表单，写上学校和团队。",claim2:"用你们喜欢的任何方式建模。需要的话，我们可以先给一份 OpenStreetMap 白模当起点。",claim3:"完成后提交模型文件，审核通过即上线，页面署上团队名字。",repoBtn:"去 GitHub 认领",close:"关闭",improve:"这所校园目前是自动生成的白模。想由你们的团队来完善它吗？"},
+ ko:{title:"세계 캠퍼스 산책",tag:"우리 캠퍼스는 우리가 만든다. 우리 학교의 실력을 세계에 보여 주세요.",back:"← 지구본으로",walk:"걷기",air:"조감",
+  intro:"모든 캠퍼스는 그 학교 학생들이 직접 만들고, 방식은 자유입니다. 지금은 한국외국어대학교 시범 화이트 모델을 걸어 볼 수 있습니다. 다른 학교는 여러분을 기다립니다.",
+  campuses:"캠퍼스",enter:"입장",claim:"맡기",find:"대학 또는 도시 검색",none:"해당 학교를 찾지 못했습니다",count:"등록 {n}곳, 걸을 수 있는 곳 {o}곳",
+  joinH:"우리 학교 추가하기",join1:"어떤 방식이든 좋습니다: 직접 모델링, 스캔, 마인크래프트, 게임 엔진",join2:"모델 파일 제출, GLB가 가장 좋고 다른 형식은 변환을 도와드립니다",join3:"캠퍼스 페이지에 팀 이름 표시, CC BY로 공개",
+  hintWalk:"화면을 끌어 둘러보세요. W A S D 또는 방향키로 걷고, Shift로 빠르게.",hintTouch:"왼쪽 아래 스틱으로 걷고, 화면을 끌어 둘러보세요.",hintAir:"끌어서 회전, 휠이나 두 손가락으로 확대.",
+  near:"근처: ",byOsm:"OpenStreetMap 데이터로 자동 생성한 화이트 모델입니다. 다듬어 줄 팀을 기다립니다.",
+  credit:"건물·도로 데이터 © OpenStreetMap 기여자 · 화이트 모델 시제품, 높이는 층수로 추정",err:"이 기기에서는 3D 화면을 표시할 수 없습니다 (WebGL 사용 불가).",
+  founder:"설립자",indep:"개인이 시작한 오픈 프로젝트이며, 여기 나오는 어떤 대학과도 공식 관계가 없습니다.",
+  claimH:"이 캠퍼스 맡기",claim1:"GitHub 저장소에서 ‘캠퍼스 맡기’ 양식에 학교와 팀을 적어 주세요.",claim2:"원하는 방식으로 모델링하세요. 필요하면 OpenStreetMap 화이트 모델을 출발점으로 드립니다.",claim3:"완성한 모델 파일을 제출하면 검토 후 공개되고, 페이지에 팀 이름이 표시됩니다.",repoBtn:"GitHub에서 맡기",close:"닫기",improve:"이 캠퍼스는 지금 자동 생성된 화이트 모델입니다. 여러분 팀이 다듬어 보시겠어요?"},
+ en:{title:"World Campus Walk",tag:"Your campus, built by you. Show the world what your university can do.",back:"← Back to globe",walk:"Walk",air:"Aerial",
+  intro:"Every campus here is built by its own students, in whatever way they choose. For now you can walk into a demo white-box of HUFS; every other campus is waiting for its builders.",
+  campuses:"Campuses",enter:"Enter",claim:"Claim",find:"Search a university or city",none:"No university matches",count:"{n} listed, {o} walkable",
+  joinH:"Add your campus",join1:"Build it any way: hand modelling, scanning, Minecraft, game engines",join2:"Send the model file. GLB is best; we help convert other formats",join3:"Your team is credited on the campus page, published under CC BY",
+  hintWalk:"Drag to look around. Walk with W A S D or arrow keys, hold Shift to run.",hintTouch:"Walk with the stick at lower left, drag to look around.",hintAir:"Drag to rotate, scroll or pinch to zoom.",
+  near:"Nearby: ",byOsm:"White-box model generated from OpenStreetMap data, waiting for a team to refine it.",
+  credit:"Building and road data © OpenStreetMap contributors · white-box prototype, heights estimated from floor counts",err:"This device cannot show the 3D view (WebGL unavailable).",
+  founder:"Founder",indep:"An independent open project, not officially affiliated with any university shown.",
+  claimH:"Claim this campus",claim1:"Fill in the Claim a campus form in the GitHub repository with your university and team.",claim2:"Model it any way you like. If you want one, we provide an OpenStreetMap white-box as a starting point.",claim3:"Submit the finished model file. Once reviewed it goes live with your team credited.",repoBtn:"Claim on GitHub",close:"Close",improve:"This campus is an automatically generated white-box model. Would your team like to refine it?"}
+};
+const REG={as:["亚洲","아시아","Asia"],eu:["欧洲","유럽","Europe"],na:["北美洲","북아메리카","North America"],sa:["南美洲","남아메리카","South America"],af:["非洲","아프리카","Africa"],oc:["大洋洲","오세아니아","Oceania"]};
+const UNIS=`hufs|as|37.597|127.059|韩国外国语大学|首尔|한국외국어대학교|서울|Hankuk Univ. of Foreign Studies|Seoul
+khu|as|37.597|127.052|庆熙大学|首尔|경희대학교|서울|Kyung Hee University|Seoul
+snu|as|37.459|126.952|首尔大学|首尔|서울대학교|서울|Seoul National University|Seoul
+korea|as|37.589|127.032|高丽大学|首尔|고려대학교|서울|Korea University|Seoul
+yonsei|as|37.566|126.939|延世大学|首尔|연세대학교|서울|Yonsei University|Seoul
+kaist|as|36.372|127.360|韩国科学技术院|大田|카이스트|대전|KAIST|Daejeon
+pku|as|39.987|116.306|北京大学|北京|베이징 대학교|베이징|Peking University|Beijing
+tsinghua|as|40.000|116.326|清华大学|北京|칭화 대학교|베이징|Tsinghua University|Beijing
+fudan|as|31.297|121.503|复旦大学|上海|푸단 대학교|상하이|Fudan University|Shanghai
+zju|as|30.303|120.087|浙江大学|杭州|저장 대학교|항저우|Zhejiang University|Hangzhou
+hku|as|22.283|114.137|香港大学|香港|홍콩 대학교|홍콩|The University of Hong Kong|Hong Kong
+cuhk|as|22.419|114.207|香港中文大学|香港|홍콩 중문대학교|홍콩|The Chinese University of Hong Kong|Hong Kong
+ntu|as|25.017|121.540|台湾大学|台北|국립대만대학교|타이베이|National Taiwan University|Taipei
+tokyo|as|35.713|139.762|东京大学|东京|도쿄 대학교|도쿄|The University of Tokyo|Tokyo
+kyoto|as|35.026|135.781|京都大学|京都|교토 대학교|교토|Kyoto University|Kyoto
+nus|as|1.297|103.777|新加坡国立大学|新加坡|싱가포르 국립대학교|싱가포르|National University of Singapore|Singapore
+um|as|3.121|101.654|马来亚大学|吉隆坡|말라야 대학교|쿠알라룸푸르|Universiti Malaya|Kuala Lumpur
+chula|as|13.738|100.532|朱拉隆功大学|曼谷|쭐랄롱꼰 대학교|방콕|Chulalongkorn University|Bangkok
+iitd|as|28.545|77.193|印度理工学院德里分校|新德里|인도 공과대학교 델리|뉴델리|IIT Delhi|New Delhi
+kfupm|as|26.307|50.146|法赫德国王石油矿产大学|宰赫兰|킹 파드 석유광물대학교|다란|KFUPM|Dhahran
+bogazici|as|41.084|29.051|海峡大学|伊斯坦布尔|보아지치 대학교|이스탄불|Boğaziçi University|Istanbul
+cambridge|eu|52.204|0.115|剑桥大学|剑桥，英国|케임브리지 대학교|케임브리지, 영국|University of Cambridge|Cambridge, UK
+oxford|eu|51.755|-1.254|牛津大学|牛津|옥스퍼드 대학교|옥스퍼드|University of Oxford|Oxford
+imperial|eu|51.499|-0.175|帝国理工学院|伦敦|임페리얼 칼리지 런던|런던|Imperial College London|London
+ucl|eu|51.525|-0.134|伦敦大学学院|伦敦|유니버시티 칼리지 런던|런던|University College London|London
+edinburgh|eu|55.944|-3.189|爱丁堡大学|爱丁堡|에든버러 대학교|에든버러|The University of Edinburgh|Edinburgh
+eth|eu|47.376|8.548|苏黎世联邦理工学院|苏黎世|취리히 연방 공과대학교|취리히|ETH Zurich|Zurich
+tum|eu|48.149|11.568|慕尼黑工业大学|慕尼黑|뮌헨 공과대학교|뮌헨|Technical University of Munich|Munich
+heidelberg|eu|49.410|8.706|海德堡大学|海德堡|하이델베르크 대학교|하이델베르크|Heidelberg University|Heidelberg
+psl|eu|48.842|2.344|巴黎文理研究大学|巴黎|파리 문리 연구 대학교 (PSL)|파리|Université PSL|Paris
+bologna|eu|44.497|11.353|博洛尼亚大学|博洛尼亚|볼로냐 대학교|볼로냐|University of Bologna|Bologna
+salamanca|eu|40.961|-5.667|萨拉曼卡大学|萨拉曼卡|살라망카 대학교|살라망카|University of Salamanca|Salamanca
+leiden|eu|52.157|4.485|莱顿大学|莱顿|레이던 대학교|레이던|Leiden University|Leiden
+copenhagen|eu|55.680|12.572|哥本哈根大学|哥本哈根|코펜하겐 대학교|코펜하겐|University of Copenhagen|Copenhagen
+jagiellonian|eu|50.061|19.934|雅盖隆大学|克拉科夫|야기에우워 대학교|크라쿠프|Jagiellonian University|Kraków
+msu|eu|55.703|37.531|莫斯科国立大学|莫斯科|모스크바 국립대학교|모스크바|Lomonosov Moscow State University|Moscow
+harvard|na|42.377|-71.117|哈佛大学|剑桥，美国|하버드 대학교|케임브리지, 미국|Harvard University|Cambridge, USA
+mit|na|42.360|-71.094|麻省理工学院|剑桥，美国|매사추세츠 공과대학교|케임브리지, 미국|MIT|Cambridge, USA
+stanford|na|37.428|-122.170|斯坦福大学|加利福尼亚|스탠퍼드 대학교|캘리포니아|Stanford University|California
+berkeley|na|37.872|-122.259|加州大学伯克利分校|伯克利|UC 버클리|버클리|UC Berkeley|Berkeley
+caltech|na|34.138|-118.125|加州理工学院|帕萨迪纳|캘리포니아 공과대학교|패서디나|Caltech|Pasadena
+yale|na|41.316|-72.922|耶鲁大学|纽黑文|예일 대학교|뉴헤이븐|Yale University|New Haven
+princeton|na|40.343|-74.655|普林斯顿大学|普林斯顿|프린스턴 대학교|프린스턴|Princeton University|Princeton
+columbia|na|40.808|-73.962|哥伦比亚大学|纽约|컬럼비아 대학교|뉴욕|Columbia University|New York
+chicago|na|41.789|-87.600|芝加哥大学|芝加哥|시카고 대학교|시카고|The University of Chicago|Chicago
+toronto|na|43.663|-79.396|多伦多大学|多伦多|토론토 대학교|토론토|University of Toronto|Toronto
+mcgill|na|45.505|-73.577|麦吉尔大学|蒙特利尔|맥길 대학교|몬트리올|McGill University|Montreal
+ubc|na|49.261|-123.246|不列颠哥伦比亚大学|温哥华|브리티시컬럼비아 대학교|밴쿠버|University of British Columbia|Vancouver
+unam|na|19.332|-99.187|墨西哥国立自治大学|墨西哥城|멕시코 국립자치대학교|멕시코시티|UNAM|Mexico City
+usp|sa|-23.561|-46.731|圣保罗大学|圣保罗|상파울루 대학교|상파울루|University of São Paulo|São Paulo
+uba|sa|-34.600|-58.373|布宜诺斯艾利斯大学|布宜诺斯艾利斯|부에노스아이레스 대학교|부에노스아이레스|Universidad de Buenos Aires|Buenos Aires
+puc|sa|-33.441|-70.640|智利天主教大学|圣地亚哥|칠레 가톨릭 대학교|산티아고|Pontificia Universidad Católica de Chile|Santiago
+uct|af|-33.958|18.461|开普敦大学|开普敦|케이프타운 대학교|케이프타운|University of Cape Town|Cape Town
+wits|af|-26.192|28.030|金山大学|约翰内斯堡|비트바테르스란트 대학교|요하네스버그|University of the Witwatersrand|Johannesburg
+cairo|af|30.027|31.208|开罗大学|开罗|카이로 대학교|카이로|Cairo University|Cairo
+makerere|af|0.335|32.568|马凯雷雷大学|坎帕拉|마케레레 대학교|캄팔라|Makerere University|Kampala
+nairobi|af|-1.280|36.816|内罗毕大学|内罗毕|나이로비 대학교|나이로비|University of Nairobi|Nairobi
+ibadan|af|7.443|3.900|伊巴丹大学|伊巴丹|이바단 대학교|이바단|University of Ibadan|Ibadan
+sydney|oc|-33.889|151.187|悉尼大学|悉尼|시드니 대학교|시드니|The University of Sydney|Sydney
+unsw|oc|-33.917|151.231|新南威尔士大学|悉尼|뉴사우스웨일스 대학교|시드니|UNSW Sydney|Sydney
+melbourne|oc|-37.798|144.961|墨尔本大学|墨尔本|멜버른 대학교|멜버른|The University of Melbourne|Melbourne
+anu|oc|-35.278|149.120|澳大利亚国立大学|堪培拉|호주 국립대학교|캔버라|Australian National University|Canberra
+auckland|oc|-36.852|174.769|奥克兰大学|奥克兰|오클랜드 대학교|오클랜드|The University of Auckland|Auckland`.split("\n").map(r=>{const f=r.split("|");return {id:f[0],reg:f[1],lat:+f[2],lon:+f[3],zh:[f[4],f[5]],ko:[f[6],f[7]],en:[f[8],f[9]]}});
+
+/* ---------- campus data (OpenStreetMap, metres from the campus origin; x east, z south)
+   line 1: buildings  campus(1/0)|local name|en|zh|ko|height m|points
+   line 2: ways       kind (m main road, s street, f footpath) + points
+   line 3: campus outline rings (optional) ---------- */
+const CD={
+hufs:`1|국제관|International Hall|国际馆|국제관|24|65,-90 34,-107 31,-106 27,-108 23,-111 20,-114 19,-117 18,-120 18,-125 20,-128 23,-132 26,-133 29,-134 33,-134 38,-133 42,-132 78,-111;1|도서관|Library|图书馆|도서관|24|-39,98 22,95 24,137 -37,140;1|역사기념관|History Memorial Hall|历史纪念馆|역사기념관|15|-62,-81 -61,-54 -40,-54 -41,-82;1|사회과학관|Social Science Hall|社会科学馆|사회과학관|20|-125,114 -126,93 -67,89 -65,110;1|외국어연수평가원|Foreign Language Training & Testing Center|外国语研修评价院|외국어연수평가원|20|-49,-139 -20,-141 -1,-142 -1,-151 -13,-151 -13,-154 -49,-153;1|교수학습개발원|Center for Teaching & Learning|教学开发院|교수학습개발원|24|-106,-140 -79,-142 -51,-144 -52,-166 -107,-162;1|인문과학관|Humanities Hall|人文科学馆|인문과학관|24|-161,-87 -159,-85 -154,-81 -132,-83 -118,-84 -125,-164 -139,-159 -152,-153 -161,-137 -164,-122;1|본관|Main Building|本馆|본관|45|-134,-12 -112,-14 -112,-11 -104,-11 -104,-14 -100,-17 -97,-14 -97,-12 -90,-12 -93,-57 -100,-56 -103,-53 -107,-57 -116,-56 -116,-54 -135,-52 -136,-60 -139,-60 -140,-70 -136,-70 -137,-72 -117,-73 -117,-75 -102,-76 -102,-73 -78,-75 -77,-70 -73,-70 -68,-9 -71,-9 -70,0 -132,4;1|국제학사|International Dormitory|国际学舍|국제학사|15|-158,81 -150,81 -149,114 -135,114 -137,82 -107,81 -108,62 -139,63 -141,13 -145,14 -145,9 -160,10;1|법학관|Law Hall|法学馆|법학관|31|-130,24 -129,46 -107,45 -108,23;1|교수회관|Faculty Hall|教授会馆|교수회관|15|28,153 56,167 82,116 54,102;1|사이버관|Cyber Hall|网络馆|사이버관|31|64,49 56,65 76,75 60,104 80,115 103,70;1|출판부|University Press|出版部|출판부|15|145,-19 153,-15 163,-35 155,-38;1|글로벌홀|Global Hall|全球馆|글로벌홀|50|163,11 150,34 148,39 159,45 161,40 164,42 175,20 174,19 174,17;1|교수연구동|Faculty Research Building|教授研究楼|교수연구동|15|-1,162 0,176 9,175 21,181 27,168 14,162 12,161 11,161 9,161;0|||||33|250,99 235,110 251,119 258,123 267,114 255,107 259,104;0|||||9|225,87 218,99 226,104 231,107 237,100 240,100 241,101 244,98;0|||||9|211,46 201,64 214,71 221,58 219,56 216,55 219,50;0|||||9|205,77 200,89 207,93 208,91 209,89 211,90 215,82;0|||||9|194,72 189,84 198,88 199,89 201,83 198,81 201,76;0|||||9|187,61 179,77 180,78 187,81 195,66;0|||||9|121,87 113,102 128,110 131,105 126,102 128,98 134,97 133,94 137,93 144,83 135,85;0|||||9|145,83 139,92 148,97 154,88 148,84;0|||||9|139,97 135,103 143,108 145,104 147,101;0|||||9|127,116 123,123 133,129 136,123 137,121;0|||||9|115,105 127,111 121,122 111,113 114,107;0|||||9|145,42 146,43 151,64 152,64 161,48 146,40;0|||||45|174,-11 166,5 165,8 170,10 169,11 177,15 185,-2 184,-3 185,-6;0|||||9|182,-26 190,-13 187,-6 175,-12 176,-14;0|||||9|158,57 154,65 156,65 164,70 168,62;0|||||9|166,43 160,53 169,58 170,55 175,47;0|||||9|190,-6 186,2 197,7 199,5 197,2;0|||||9|183,11 178,21 184,24 188,15 189,14;0|||||9|177,54 174,59 173,60 178,63 178,65 182,67 186,59;0|||||9|193,47 188,57 196,60 199,54 200,55 200,54 202,50 195,46 194,47;0|||||9|182,42 180,45 178,49 184,52 183,54 187,56 192,47;0|||||9|188,30 198,35 193,44 188,42 189,40 186,39 186,38 187,37 185,36;0|||||9|196,17 194,19 193,21 202,26 205,21;0|||||9|148,112 156,117 149,129 141,125;0|||||9|139,127 134,136 140,143 142,144 148,132;0|||||9|179,104 175,113 184,118 189,109 185,107;0|||||9|195,111 188,123 197,128 204,115 199,113;0|||||9|183,121 177,132 192,139 196,131 197,129;0|||||9|168,126 165,131 163,136 171,140 177,130;0|||||9|156,147 153,154 156,157 160,162 165,152;0|||||27|164,118 171,105 156,97 149,110;0|||||9|99,29 95,36 104,40 110,38 115,37;0|||||9|107,117 103,125 101,129 104,131 104,132 107,134 116,123 111,119;0|||||9|100,132 96,140 89,153 99,158 111,137;0|||||36|65,203 65,206 66,212 77,210 78,222 85,221 85,213 83,197 77,197 73,199 70,200 71,203;0|||||39|31,169 24,180 40,191 48,179;0|||||48|24,200 19,207 31,214 35,208 38,203 33,199 28,195 25,200;0|||||42|13,205 9,212 13,214 6,226 5,232 18,235 24,226 30,216;0|||||9|75,178 72,183 66,194 68,195 75,193 77,189 86,193 88,188 87,184;0|||||9|91,156 98,160 99,169 90,173 86,163 88,159;0|||||9|99,160 100,171 106,170 107,168 109,168 108,159;0|||||9|120,158 120,167 122,167 122,171 128,170 128,157;0|||||9|117,174 117,182 129,182 129,174;0|||||9|130,173 130,181 140,181 140,173;0|||||9|-19,158 -11,177 -1,173 -9,154 -14,156;0|||||9|-37,161 -36,166 -38,166 -37,171 -23,170 -23,160 -30,160;0|||||9|-55,169 -54,178 -51,177 -50,184 -37,183 -39,164 -51,166 -53,169;0|||||9|-36,178 -35,186 -27,185 -28,177;0|||||9|-22,188 -22,193 -21,197 -10,195 -12,185 -16,186;0|||||9|-208,150 -211,160 -180,170 -173,150 -182,147 -186,157;0|||||9|-231,134 -225,146 -166,117 -170,105;0|||||9|-233,109 -229,118 -174,94 -178,84;0|||||9|-232,78 -228,86 -213,79 -216,74 -195,64 -193,68 -180,62 -184,53 -200,60 -218,66 -216,71;0|||||9|-207,-3 -193,11 -188,15 -181,9 -200,-9;0|||||9|-221,-34 -203,-34 -203,-24 -221,-23;0|||||9|-183,-63 -172,-62 -172,-53 -183,-53;0|||||9|-185,-41 -174,-40 -175,-32 -186,-33;0|||||9|-198,-95 -187,-96 -186,-87 -197,-85;0|||||9|-204,-141 -192,-143 -191,-133 -202,-132;0|||||9|-186,-122 -175,-123 -174,-114 -185,-112;0|||||9|-190,-143 -175,-145 -174,-135 -189,-133;0|||||75|127,-159 134,-142 138,-124 145,-110 155,-113 171,-114 171,-124 161,-126 152,-128 143,-139 138,-157 135,-162;0|||||75|79,-188 67,-184 74,-169 82,-153 78,-144 87,-139 97,-152 110,-154 105,-166 95,-160 87,-165 84,-183;0|||||75|32,-199 24,-191 36,-180 33,-178 39,-170 59,-177 55,-187 47,-185 39,-194;0|||||75|0,-206 -4,-196 10,-190 18,-187 22,-196 17,-203 7,-207;0|||||60|17,-176 13,-165 29,-158 42,-151 49,-161 25,-171 27,-177 19,-181;0|||||75|140,-219 147,-201 155,-177 158,-169 168,-173 185,-173 184,-184 171,-187 162,-188 156,-199 148,-222;0|||||9|257,-174 251,-165 243,-146 245,-137 257,-132 263,-146 272,-142 275,-152 264,-156 270,-169;0|||||9|237,-121 230,-108 223,-111 216,-96 232,-89 246,-117;0|||||9|188,-102 200,-122 191,-127 180,-106;0|||||9|191,-142 186,-132 201,-124 206,-135;0|||||9|217,-159 212,-148 196,-155 202,-165;0|||||9|199,-179 194,-169 217,-160 221,-170;0|||||9|113,-113 110,-107 140,-89 160,-81 165,-91 157,-96 155,-91;0|||||9|-37,-212 -35,-172 -21,-172 -23,-213
+s159,-71 141,-79 131,-83 108,-96 88,-110 19,-149 -18,-166 -90,-175;s60,181 52,177 14,156 9,155 5,154 -6,154 -36,157 -60,159 -108,170 -174,173;s-3,-4 -17,-12 -20,-55 -23,-107 -24,-132 -24,-134 -25,-135;s21,10 -7,11 -16,11 -15,29 -12,85 -45,87 -49,88;s-17,-12 -16,11 -31,12;s-79,-87 -81,-133 -50,-135 -28,-136 -27,-136 -26,-136 -26,-135 -25,-135;s-81,-133 -114,-132;s-114,-132 -117,-172;s-81,-85 -82,-84 -84,-84 -86,-83 -110,-81 -147,-79 -143,-16 -142,3;m125,63 140,69 160,81 183,93;s98,110 105,113 108,115 110,116 111,117 123,128 131,136 150,155 154,159 174,181;s131,136 156,87 160,81;s150,155 179,100 183,93;f-67,-88 -65,-30 -64,6 -63,14 -63,30 -62,46 -57,93;f-15,29 -41,29 -63,30;f-63,11 -91,12 -96,12 -99,12 -105,12 -130,13;f-142,3 -136,11 -130,13;f-134,58 -103,56 -103,48 -105,27 -105,12;f-61,82 -100,84 -102,70 -102,57 -103,56;s-176,180 -163,139 -181,28 -178,2 -169,-31 -166,-70 -172,-121 -158,-153;s-158,-153 -143,-160 -136,-164 -117,-172 -90,-175;m177,-41 159,-5 153,7 129,51 125,63;m125,63 118,73 98,110 70,163 60,181 58,185;f-169,-31 -160,-37 -158,-72 -147,-79;f41,-88 35,-76 6,-20 0,-8;f35,-76 -14,-52;f139,-17 151,-10 159,-5;s-114,-132 -110,-81;f-143,-50 -141,-14 -95,-16 -96,-52 -143,-50;f-134,50 -103,48;f-2,-55 6,-20;f-136,11 -134,50 -134,58;f102,60 62,40 25,21 20,21 -3,23 -7,23 -8,25 -7,74 -5,78 0,78 24,76 28,73 38,59 44,54 62,40;f48,183 50,181 52,177 109,71 110,69 110,67 109,65 109,64 107,62 102,60;f6,22 17,39 21,45 36,62;f36,62 53,71;s-12,85 19,84;s125,63 113,57 107,54 29,14 21,10 -3,-4;f-3,23 -7,11 -8,9 -8,8 -8,6;f-8,6 -9,-4;f-6,-11 0,-8 19,2;f-65,-35 -51,-36 -49,-36 -47,-35;f-47,-35 -33,-29 -24,-24;f-21,5 -27,-87 -28,-90 -32,-91 -70,-88 -73,-86 -78,-81 -82,-80 -140,-75;s-23,-95 -52,-93 -69,-93 -71,-92 -74,-91 -76,-90 -78,-89 -79,-87 -81,-85;f-6,-11 -11,-14 -12,-16 -14,-52 -17,-96 -14,-100 -11,-102 -7,-102 34,-79 35,-76;s14,-119 -3,-129 -5,-130 -6,-130 -8,-130 -10,-129 -16,-125 -24,-120;s62,-77 -8,-115 -9,-115 -11,-115 -13,-115 -15,-114 -23,-107;f-57,93 -50,101 -46,106 -40,143 -36,144 -11,142 1,142 17,146 26,150;f-77,44 -80,41 -95,30 -99,12;f-96,57 -92,52 -91,51 -80,41 -71,32 -68,29 -63,24;f-60,37 -58,83 -47,82 -21,81 -19,80 -18,79 -19,39 -19,31 -57,32 -60,37;f-62,35 -60,37 -37,61 -19,80;f-47,82 -47,76 -46,74 -45,72 -37,61 -19,39;f-91,12 -74,30 -71,32;f19,2 25,5;f25,5 32,9 75,30;f32,9 29,14 25,21;f75,30 80,33 83,34;f83,34 110,48 113,49 116,49 117,49 118,49 120,49 121,47 122,46 151,-10;f178,-23 142,44 142,46 142,50 143,56 144,59 144,60 146,63 149,65 150,66 154,68 164,73;f67,190 118,89 123,83 130,81 134,80 142,81 156,87 179,100;f134,80 140,69 144,60;f118,48 118,49 125,63 134,80;f109,65 125,63 144,60;f-54,97 19,93;f19,93 23,94 45,106 47,107 47,110 46,112 26,150;f26,150 23,94;f-65,-17 -49,-10 -46,-9 -34,-4;f-64,6 -49,-10 -33,-29;f-63,14 -45,10 -33,7;f62,-165 78,-129 85,-126 92,-126 102,-125 112,-122 153,-102 167,-105 175,-108 180,-120;f183,-70 178,-68 173,-69 142,-83 121,-90 90,-114 83,-119 11,-157
+`
+};
+// a better first view for campuses where the automatic choice is not ideal
+const STARTS={hufs:{x:112,z:56,yaw:-1.10}};
+
+/* world coastlines (Natural Earth 110m via world-atlas, simplified): 2 base-36 chars lon+180, 2 chars lat+90 */
+const LAND="3c0a3c0938093609380a3b0a3c0a;0l0b0i0b0h0b0h0c0k0b0l0b;3r0c3t0b3t0a3p093m093i093k0a3m0b3n0c3o0c3r0c;290i2b0i290i260i290i;340j330i320i300i2z0i2x0i2y0j300j300k310l320l330k340j;0005030604060b060m0511050q060p080t090w0a0o0b0n0d0u0d0y0e120f190g1e0g1l0g1s0g1w0f220f280f250h290h2e0h2k0h2p0g2u0h2z0h350i340k340l350n380p3c0q3e0q3b0p3a0o360m390l3a0j3b0g380f310d2v0d2w0c2v0a34093d073k083u084409460b400c460d4c0e4i0f4k0h4o0i4t0i4w0j510j560k5a0k5f0k5j0k5o0j5t0k5x0l610l650l6a0m6e0n6i0o6l0n6p0m6u0m6y0l6x0j6y0i710j750k780m7c0n7g0o7k0n7o0n7s0n7w0o810n860o890n8e0n8j0n8o0o8r0p8t0n8z0n930m990l9d0l9i0j9n0j9r0i9o0g9k0f9k0d9l0b9g099k089s060005;3410370z360z350z330z310z2z102y113110321133113410;3d133e123c123b123d123d13;911d931d941d941c941b931a911b911d;9t1d9u1d9u1c9t1b9t1a9r1a9r189p179o189n189o1a9q1a9r1b9s1c9t1e9t1d;9v1i9v1h9w1g9x1g9z1g9y1f9x1f9x1e9w1d9v1d9v1e9u1e9v1f9v1h9u1h9t1j9t1k9u1j9v1i;9n1w9m1w9l1x9k1y9l1y9m1x9n1w;00219z219z2200220021;6e246e236e226e216d206d1y6c1u6a1t691t681u671v671x681x681z6820682169226a226b236c246d266e266e24;9024912391229220931z951x961w971v991t991r991p991m971k961i961h931g911f901g8y1g8w1h8v1i8u1k8t1j8u1l8s1j8r1l8p1m8m1m8i1m8g1l8e1k8c1k8b1j891j871k881l871n871p861r861s861t861u861w871x891x8b1y8c1y8e1z8e218g218g228h238i248j248l238m248n258p268o278q268s268t268s258r238t228v218w208x228y238y258y268z278z2690259024;8g288f288g298h298j2a8i298g28;8a2a8b2a8a2989298a2a;812b832c852a882a852a842a812a802a7y2b7y2c802c812b;9c2b9b2b9b2d9c2c9c2b;982d972c962c952c942d962c962d972d982d982e982d;992e982f972f982f992e;8q2h8r2f8t2g8v2g8x2f912e922d942c932b942a952996289728962795289329922a902a8z298y298w2a8v2a8u2a8u2c8s2d8q2e8p2e8p2f8p2g8q2g8o2g8n2h8o2i8q2h;8h2j8g2i8d2i8c2h8d2h8f2h8e2g8e2f8f2d8f2c8f2e8d2d8d2e8c2f8c2c8b2d8b2f8b2h8c2j8e2j8g2j8h2j;8l2j8k2i8k2h8k2i8k2k8l2j;7y2c7w2d7u2e7t2g7r2i7r2k7p2l7n2n7o2n7q2m7s2l7u2k7v2j7v2h7w2h7x2g7y2f7y2c;8a2k8a2j8a2h892g882e862f852f842f822f822h812i822k832k842l862m872n882o892p8a2o8b2n8a2n8a2m8a2k;8i2q8j2p8i2p8i2o8g2o8g2p8f2p8e2p8e2q8f2r8h2r8i2r8i2q;792o782p782s792r7a2o792o;8g2s8f2r8e2s8f2s8f2t8g2t8g2s;8i2u8h2t8h2s8h2t8g2t8h2u8h2v8i2u;8d318e308e2y8e2x8e2w8g2w8g2v8f2v8d2w8d2x8c2x8c2y8c308d31;2v302u302w302v30;2z323032323232313331343133303230313030302z302y302z3130312z312z32;823181318132833283318231;0o310o320p320p310o31;2s352u352v342w332y322x322w322v322u332t342s342q342q352p342o342n342o352p352q352r352s35;8r3g8q3f8p3f8o3f8p3g8q3g8r3g;5z3i5y3h5x3h5w3h5x3h5y3h5z3i;5o3i5p3h5q3h5p3h5o3i;5g3k5f3j5e3j5c3k5e3k5g3k;593n5a3l593l583m593n;8x3j8x3i8v3h8s3f8r3h8o3g8o3f8n3d8m3e8l3f8n3g8p3h8s3i8t3j8v3k8w3n8x3n8y3l8x3j;903q913q903p8y3p8w3o8w3p8y3r8z3r903q;1k3v1i3v1h3w1g3w1g3x1h3w1j3w1k3v;3g3x3g3w3i3w3i3v3j3u3j3t3i3t3i3u3g3t3g3u3d3u3e3v3f3x3h3y3g3x;1b401c3z1c3y1b3z1b40;903x8z3v903t8z3t8y3t8y3v8y3x8y3z8y408z408z3y903x;4t3y4q3y4q404s414u414u3z4t3y;4x454x444y434y425040503z523y513x4z3x4x3x4v3w4u3w4x3x4v3y4v3z4x3z4w414v414v424u424u444w454x45;084a0a4a0b490a4909490849084a;2n4c2o4b2p4b2q4a2s4a2p4a2o4a2m4a2m4c2n4c;4l4c4m4b4i4a4g4a4e4a4e4b4c4c4e4c4h4c4k4d4l4c;004f054d074a044b004c9x4b9z489r469l469j449g409c3y9d449k499d4797468v438v408x3w8s3q8n3p8m3n8k3m8l3j8j3g8j3j8h3k8h3l8f3m8e3m8a3l8c3j8d3j8d3f8e3c8c398735833381347y30812u7x2r7v2u7s2u7s2q7u2o7v2l7w2j7t2n7s2p7q2r7r2v7p2y7m307k337j347h347e327a2z782w772s752r732w71326y346u376n386j386e3c6c3c6d396f376f386g366j376k386m366o346m326l316j306h2z6e2x6b2v692v672w672y662z6432623661385z3b5y3a5w3c5y3861346131642x672v672t6b2t6d2t6f2u6e2q6a2k662g642e632b6429652563215z1y5z1w5z1u5x1s5w1p5u1n5q1k5n1k5k1j5i1k5i1n5f1r5e1w5c205c245e275d295c2c592g592j592m572m542o4z2n4w2n4s2m4p2p4n2r4l2t4k2u4j2w4k2y4k324j344l364m394q3b4r3f4v3i4z3i553j583j5b3j5a3g5d3f5h3d5k3e5n3e5q3e5u3d5x3d5z3e603h603j5w3j5s3j5r3m5y3o643n643p613r623t5z3s5y3q5y3s5u3s5t3q5t3n5q3n5o3m5n3m5o3k5m3i5k3l5j3n5j3o5f3q5e3r5d3s5e3q5g3o5i3m5h3l5g3l5f3n5b3o583q533p513n4z3k4v3i4t3j4r3k4r3m4r3p4w3p4y3t4y3v533x573z594059435a435a415c405g415k415n445o445r455o465l495p4c5k4a5i455e415a4555485f4e5p4h5v4g654d5x4d614a644b684d6a4e6e4e6j4e6o4g6x4f6v4h714j714f714d734f734i744h794j7e4k7l4m7t4n7z4n864m834k884k8h4k8m4h8t4h964i9g4g9m4f9q4g004f;2c4f2a4f284f2a4g2b4g2c4f;2h4f2l4d2p4g2r4d2l4b2h492d452j432p412s3x2u412t452w483147344439443e413g3y3a3w333v353v383s3c3s363q353r313p323o303n2z3n2y3m2x3l2w3j2w3k2w3j2t3g2r3d2r3a2r372p392o3c2k3c2j3b2h3b2d3b2b392a372b332d312h312i332l332k302k2z2j2y2k2y2m2y2n2y2p2x2o2w2o2u2p2s2q2r2s2r2u2r2w2r2y2t312u302t312s322u352t382t3a2s3d2q3f2o3i2o3l2m3m2i3r2g3w2f412d3z273x223v1x3r1v3n1r3l1n3i1k3e1k3f1i3a1f381d381c36193617331332112y112w152y1a2y1b2y1h301n321u31212w242s2b2r2e2r2g2s2i2t2k2v2m2v2p2u2q2s2q2s2p2q2q2p2q2o2r2n2s2m2s2l2u2l2v2k2v2h2w2e2y2b2y26302331233321361z381w3a1v3d1t3d1v3b1w391x361y351w371u391t3a1s3c1q3g1o3g1l3k1k3n1k3t1l3t1j3w1f3z1c41174410460v460t470q450n430j410g410l430m450k450h460e470h490i4a0g4b0d4c0i4d0e4f0j4g0q4h0u4h124g184f1f4g1k4g1o4f1t4e204e234f2a4e2d4e2c4h2g4g2h4f;1u4j1w4j1y4j204i204j214j234i254g274g264f244f214f1w4f1u4f1s4f1r4g1u4g1u4h1q4h1s4h1p4i1q4j1u4j;2w4j2v4j2t4j2r4j2s4k2w4j;2l4j2n4j2r4j2t4i2w4i2y4h314h344g334f374e3a4d384b354c344c364b37493649354936483149304a2x4b2u4a2u4b2y4b2y4c2z4e2x4f2w4f2u4g2t4g2n4g2j4g2k4h2i4i2k4k2l4j;284k2b4k2a4j2b4i294h264j284j284k;2f4j2d4i2c4j2d4k2h4k2f4j;1o4h1k4h1i4i1k4k1m4k1q4k1s4j1p4j1o4h;2a4n2a4m284l274m254m284n2a4n;204m214m224l1y4l1u4k1w4l1q4l1t4m1x4m1y4m1z4n204m;6m4h6i4h6g4h6g4i6i4k6k4l6m4m6t4m6w4n6w4m6q4l6l4j6k4i6m4h;2d4n2g4n2h4m2j4m2m4l2p4m2s4l2p4l2k4k2g4l2f4m2c4m2b4n2d4n;1s4o1r4n1o4m1l4m1p4o1s4o;284o274o234o234p244p284o;5i4q5j4p5i4o5g4n5f4o5b4p5d4q5f4q5h4q5i4q;5p4q5q4q5k4q5i4q5k4r5n4r5p4q;6f4r6d4q6c4q6b4r6d4r6e4r6f4r;7s4p7n4p7l4q7m4r7q4r7s4p;2l4q2l4p2h4o2e4p2f4p2c4q2c4r2e4r2g4r2j4r2l4q;344t384t3a4s354s374s334r2z4q2v4p2w4p2w4o2u4o2s4n2u4n2p4m2k4m2i4n2k4o2n4o2k4o2n4p2l4q2o4q2q4q2k4r2i4r2g4s2j4s2n4t2p4s2r4t2w4t2z4t344t;494u494s484s4e4s4k4s4k4r4i4q4g4o4e4n4f4l4g4k4c4j4e4h4c4h4a4g4b4f444e404c3w4b3v493t473q473m483k4b3i4d3l4f3j4f3h4g3l4h3h4h3h4j3d4l394m324m354n2z4o374q384r3c4s3j4s3p4s3p4t3x4u494u";
+
+/* ---------- helpers ---------- */
+const $=id=>document.getElementById(id);
+let lang="zh";
+try{const s=localStorage.getItem("wcw-lang");if(s&&T[s])lang=s}catch(e){}
+const t=k=>T[lang][k];
+const li=l=>l==="zh"?0:l==="ko"?1:2;
+const reduceMotion=!!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);
+const coarse=!!(window.matchMedia&&matchMedia("(pointer: coarse)").matches);
+const pts=s=>s.split(" ").map(q=>{const a=q.split(",");return [+a[0],+a[1]]});
+function inPoly(x,z,p){let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){const a=p[i],b=p[j];if((a[1]>z)!==(b[1]>z)&&x<(b[0]-a[0])*(z-a[1])/(b[1]-a[1])+a[0])c=!c}return c}
+function segDist(x,z,a,b){const dx=b[0]-a[0],dz=b[1]-a[1],l=dx*dx+dz*dz||1;let u=((x-a[0])*dx+(z-a[1])*dz)/l;u=Math.max(0,Math.min(1,u));return Math.hypot(x-a[0]-u*dx,z-a[1]-u*dz)}
+function toast(msg){const e=$("toast");e.textContent=msg;e.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display="none",3600)}
+UNIS.forEach(u=>u.open=!!CD[u.id]);
+const uniById=id=>UNIS.find(u=>u.id===id);
+
+/* parse one campus */
+function parseCampus(id){
+  const L=CD[id].split("\n");
+  const B=(L[0]||"").split(";").filter(Boolean).map(r=>{const f=r.split("|");const p=pts(f[6]);let x=0,z=0,x0=1e9,x1=-1e9,z0=1e9,z1=-1e9,ar=0;
+    p.forEach((q,i)=>{x+=q[0];z+=q[1];x0=Math.min(x0,q[0]);x1=Math.max(x1,q[0]);z0=Math.min(z0,q[1]);z1=Math.max(z1,q[1]);const n=p[(i+1)%p.length];ar+=q[0]*n[1]-n[0]*q[1]});
+    return {campus:f[0]==="1",name:f[1],en:f[2],zh:f[3],ko:f[4],h:Math.max(3,+f[5]||9),p,cx:x/p.length,cz:z/p.length,bb:[x0,x1,z0,z1],area:Math.abs(ar)/2}});
+  const W=(L[1]||"").split(";").filter(Boolean).map(r=>({k:r[0],p:pts(r.slice(1))}));
+  const A=(L[2]||"").split(";").filter(Boolean).map(pts);
+  let ext=60;B.forEach(b=>{ext=Math.max(ext,Math.abs(b.cx)+20,Math.abs(b.cz)+20)});W.forEach(w=>w.p.forEach(q=>{ext=Math.max(ext,Math.abs(q[0]),Math.abs(q[1]))}));
+  return {id,B,W,A,ext:Math.min(ext,900)};
+}
+function bname(b){if(!b.name)return "";if(lang==="zh")return b.zh||b.en||b.name;if(lang==="ko")return b.ko||b.name;return b.en||b.name}
+
+/* ---------- three setup ---------- */
+let renderer=null;
+const canvas=$("stage");
+try{if(typeof THREE!=="undefined")renderer=new THREE.WebGLRenderer({canvas,antialias:true})}catch(e){renderer=null}
+if(!renderer)$("err").style.display="block";
+const labels=$("labels");
+let view="globe",mode="walk",cur=null;
+
+/* globe */
+const gScene=renderer?new THREE.Scene():null;
+const gCam=renderer?new THREE.PerspectiveCamera(40,1,0.1,50):null;
+const globe=renderer?new THREE.Group():null;
+function ll(lat,lon,r){const ph=(lon+180)/360*2*Math.PI,th=(90-lat)/180*Math.PI;return new THREE.Vector3(-Math.cos(ph)*Math.sin(th)*r,Math.cos(th)*r,Math.sin(ph)*Math.sin(th)*r)}
+if(renderer){
+  gScene.background=new THREE.Color(0x0c1a26);gCam.position.set(0,0,3.3);gScene.add(globe);
+  const c=document.createElement("canvas");c.width=2048;c.height=1024;const g=c.getContext("2d");
+  g.fillStyle="#1b3a50";g.fillRect(0,0,2048,1024);
+  g.strokeStyle="rgba(255,255,255,.07)";g.lineWidth=1;
+  for(let lo=0;lo<=360;lo+=15){g.beginPath();g.moveTo(lo/360*2048,0);g.lineTo(lo/360*2048,1024);g.stroke()}
+  for(let la=0;la<=180;la+=15){g.beginPath();g.moveTo(0,la/180*1024);g.lineTo(2048,la/180*1024);g.stroke()}
+  g.fillStyle="#e6e0cf";g.strokeStyle="#b9b29c";g.lineWidth=1.2;
+  LAND.split(";").forEach(r=>{g.beginPath();for(let i=0;i+3<r.length;i+=4){const x=parseInt(r.substr(i,2),36)/360*2048,y=(180-parseInt(r.substr(i+2,2),36))/180*1024;i?g.lineTo(x,y):g.moveTo(x,y)}g.closePath();g.fill();g.stroke()});
+  g.fillRect(0,1024-5/180*1024,2048,40);
+  const tex=new THREE.CanvasTexture(c);tex.anisotropy=4;
+  globe.add(new THREE.Mesh(new THREE.SphereGeometry(1,64,48),new THREE.MeshBasicMaterial({map:tex})));
+  gScene.add(new THREE.Mesh(new THREE.SphereGeometry(1.04,48,32),new THREE.MeshBasicMaterial({color:0x49c5b6,transparent:true,opacity:0.08,side:THREE.BackSide})));
+  UNIS.forEach(u=>{
+    u.pos=ll(u.lat,u.lon,1.012);
+    const m=new THREE.Mesh(new THREE.SphereGeometry(u.open?0.016:0.011,14,10),new THREE.MeshBasicMaterial({color:u.open?0xf2b632:0x49c5b6}));
+    m.position.copy(u.pos);globe.add(m);
+    u.el=document.createElement("div");u.el.className="lab";labels.appendChild(u.el);
+  });
+  const p=uniById("hufs").pos;globe.rotation.y=Math.atan2(-p.x,p.z);globe.rotation.x=0.45;
+}
+let spin=!reduceMotion,sel=null,tgt=null;
+function focusUni(u){sel=u;spin=false;const p=u.pos;tgt={y:Math.atan2(-p.x,p.z),x:Math.max(-1.2,Math.min(1.2,u.lat*Math.PI/180*0.85))};if(gCam&&gCam.position.z>3.3)gCam.position.z=3.3;renderList()}
+
+/* campus scenes, built on first visit */
+const cCam=renderer?new THREE.PerspectiveCamera(68,1,0.3,2500):null;
+const built={};
+function buildCampus(id){
+  const C=parseCampus(id);const S=new THREE.Scene();
+  S.background=new THREE.Color(0xcfe3ee);S.fog=new THREE.Fog(0xcfe3ee,Math.max(180,C.ext*0.6),Math.max(620,C.ext*2.2));
+  S.add(new THREE.HemisphereLight(0xffffff,0x8a9a8a,0.85));
+  const sun=new THREE.DirectionalLight(0xfff2dc,0.75);sun.position.set(-120,200,90);S.add(sun);
+  const ground=new THREE.Mesh(new THREE.PlaneGeometry(C.ext*5,C.ext*5),new THREE.MeshLambertMaterial({color:0xb9c8b0}));ground.rotation.x=-Math.PI/2;S.add(ground);
+  const plotM=new THREE.MeshLambertMaterial({color:0xc9d9bd});
+  C.A.forEach(r=>{if(r.length<3)return;const sh=new THREE.Shape();r.forEach((q,i)=>i?sh.lineTo(q[0],-q[1]):sh.moveTo(q[0],-q[1]));const m=new THREE.Mesh(new THREE.ShapeGeometry(sh),plotM);m.rotation.x=-Math.PI/2;m.position.y=0.02;S.add(m)});
+  const mCampus=new THREE.MeshLambertMaterial({color:0xf6f3ec}),mAround=new THREE.MeshLambertMaterial({color:0xc3c9cf});
+  const mEdge=new THREE.LineBasicMaterial({color:0x3a4a55}),mEdge2=new THREE.LineBasicMaterial({color:0x9aa4ab});
+  const labs=[];
+  C.B.forEach(b=>{
+    const sh=new THREE.Shape();b.p.forEach((q,i)=>i?sh.lineTo(q[0],-q[1]):sh.moveTo(q[0],-q[1]));
+    let geo;try{geo=new THREE.ExtrudeGeometry(sh,{depth:b.h,bevelEnabled:false});}catch(e){return}
+    geo.rotateX(-Math.PI/2);
+    S.add(new THREE.Mesh(geo,b.campus?mCampus:mAround));
+    S.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo,20),b.campus?mEdge:mEdge2));
+    if(b.campus&&b.name){const el=document.createElement("div");el.className="lab b";el.style.display="none";labels.appendChild(el);labs.push({b,el,v:new THREE.Vector3(b.cx,b.h+3,b.cz)})}
+  });
+  const wid={m:11,s:5,f:2.6},col={m:0x8d969c,s:0xa7aeb2,f:0xe9e2cf},yy={m:0.05,s:0.07,f:0.09};
+  ["m","s","f"].forEach(k=>{const v=[];
+    C.W.filter(w=>w.k===k).forEach(w=>{for(let i=0;i<w.p.length-1;i++){const a=w.p[i],b=w.p[i+1];const dx=b[0]-a[0],dz=b[1]-a[1],l=Math.hypot(dx,dz);if(!l)continue;const hw=wid[k]/2,nx=-dz/l*hw,nz=dx/l*hw,ex=dx/l*hw,ez=dz/l*hw,y=yy[k];
+      const A=[a[0]-ex+nx,y,a[1]-ez+nz],Bq=[a[0]-ex-nx,y,a[1]-ez-nz],Cq=[b[0]+ex+nx,y,b[1]+ez+nz],D=[b[0]+ex-nx,y,b[1]+ez-nz];v.push(...A,...Bq,...Cq,...Bq,...D,...Cq)}});
+    if(!v.length)return;const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.Float32BufferAttribute(v,3));
+    S.add(new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:col[k],side:THREE.DoubleSide})))});
+  // trees: seeded scatter on campus, kept off buildings and roads
+  let seed=20261111;const rnd=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+  const onCampus=(x,z)=>C.A.length?C.A.some(r=>inPoly(x,z,r)):Math.hypot(x,z)<C.ext*0.7;
+  const spots=[],E=C.ext;
+  for(let n=0;n<1600&&spots.length<240;n++){const x=(rnd()*2-1)*E,z=(rnd()*2-1)*E;
+    if(!onCampus(x,z))continue;
+    if(C.B.some(b=>x>b.bb[0]-3&&x<b.bb[1]+3&&z>b.bb[2]-3&&z<b.bb[3]+3&&(inPoly(x,z,b.p)||b.p.some((q,i)=>segDist(x,z,q,b.p[(i+1)%b.p.length])<3))))continue;
+    if(C.W.some(w=>w.p.some((q,i)=>i<w.p.length-1&&segDist(x,z,q,w.p[i+1])<(w.k==="f"?3:7))))continue;
+    spots.push([x,z,0.8+rnd()*0.7])}
+  if(spots.length){
+    const crown=new THREE.InstancedMesh(new THREE.ConeGeometry(2.4,6.5,7),new THREE.MeshLambertMaterial({color:0x6f9b78}),spots.length);
+    const trunk=new THREE.InstancedMesh(new THREE.CylinderGeometry(0.25,0.3,2.2,6),new THREE.MeshLambertMaterial({color:0x7a6a58}),spots.length);
+    const M=new THREE.Matrix4();
+    spots.forEach((s,i)=>{M.makeScale(s[2],s[2],s[2]);M.setPosition(s[0],(2.2+3.25)*s[2],s[1]);crown.setMatrixAt(i,M);M.makeScale(s[2],s[2],s[2]);M.setPosition(s[0],1.1*s[2],s[1]);trunk.setMatrixAt(i,M)});
+    crown.instanceMatrix.needsUpdate=true;trunk.instanceMatrix.needsUpdate=true;S.add(crown);S.add(trunk)}
+  // air-mode labels: the largest named buildings
+  const big=labs.slice().sort((a,b)=>b.b.area-a.b.area).slice(0,18);big.forEach(l=>l.big=true);
+  // starting point: the walkable path point nearest the origin
+  let start=STARTS[id];
+  if(!start){let best=null,bd=1e9;
+    C.W.forEach(w=>{if(w.k==="m")return;w.p.forEach(q=>{const d=Math.hypot(q[0],q[1]);if(d<bd&&!blockedIn(C,q[0],q[1])){bd=d;best=q}})});
+    if(!best)best=[0,0];
+    start={x:best[0],z:best[1],yaw:Math.atan2(-best[0],best[1])+Math.PI};
+    const look=[-best[0],-best[1]];if(Math.hypot(look[0],look[1])>1)start.yaw=Math.atan2(look[0],-look[1]);}
+  return {C,S,labs,start};
+}
+function blockedIn(C,x,z){for(const b of C.B){if(x>b.bb[0]&&x<b.bb[1]&&z>b.bb[2]&&z<b.bb[3]&&inPoly(x,z,b.p))return true}return false}
+
+/* ---------- state + input ---------- */
+const me={x:0,z:0,yaw:0,pitch:0};
+const air={az:0.9,el:0.75,dist:420};
+const keys={};const stick={x:0,y:0};
+addEventListener("keydown",e=>{if(e.target&&e.target.tagName==="INPUT")return;keys[e.code]=true;if(view==="campus"&&/^Arrow/.test(e.code))e.preventDefault()});
+addEventListener("keyup",e=>{keys[e.code]=false});
+addEventListener("blur",()=>{for(const k in keys)keys[k]=false});
+const ptr=new Map();let moved=0,pinch=0;
+canvas.addEventListener("pointerdown",e=>{ptr.set(e.pointerId,[e.clientX,e.clientY]);moved=0;spin=false;tgt=null;try{canvas.setPointerCapture(e.pointerId)}catch(_){}
+  if(ptr.size===2){const a=[...ptr.values()];pinch=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1])}});
+canvas.addEventListener("pointermove",e=>{const p=ptr.get(e.pointerId);if(!p||!renderer)return;const dx=e.clientX-p[0],dy=e.clientY-p[1];p[0]=e.clientX;p[1]=e.clientY;moved+=Math.abs(dx)+Math.abs(dy);
+  if(ptr.size===2){const a=[...ptr.values()];const d=Math.hypot(a[0][0]-a[1][0],a[0][1]-a[1][1]);if(pinch&&d)zoom(pinch/d);pinch=d;return}
+  if(view==="globe"){const k=0.005*(gCam.position.z-1)/2.3;globe.rotation.y+=dx*k;globe.rotation.x=Math.max(-1.2,Math.min(1.2,globe.rotation.x+dy*k))}
+  else if(mode==="walk"){me.yaw+=dx*0.004;me.pitch=Math.max(-1.2,Math.min(1.2,me.pitch+dy*0.004))}
+  else{air.az-=dx*0.005;air.el=Math.max(0.15,Math.min(1.5,air.el+dy*0.005))}});
+function up(e){const had=ptr.delete(e.pointerId);pinch=0;if(had&&view==="globe"&&moved<6)pick(e)}
+canvas.addEventListener("pointerup",up);canvas.addEventListener("pointercancel",e=>{ptr.delete(e.pointerId);pinch=0});
+canvas.addEventListener("wheel",e=>{e.preventDefault();zoom(e.deltaY>0?1.1:0.9)},{passive:false});
+function zoom(f){if(!renderer)return;if(view==="globe")gCam.position.z=Math.max(1.3,Math.min(6,gCam.position.z*f));else if(mode==="air"&&cur)air.dist=Math.max(60,Math.min(cur.C.ext*3,air.dist*f))}
+const ray=renderer?new THREE.Raycaster():null,nd=renderer?new THREE.Vector2():null;
+const v3=renderer?new THREE.Vector3():null,camDir=renderer?new THREE.Vector3():null;
+function pick(e){const r=canvas.getBoundingClientRect();nd.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(nd,gCam);
+  globe.updateMatrixWorld();let best=null,bd=0.012+0.03*(gCam.position.z-1)/2.3;
+  UNIS.forEach(u=>{v3.copy(u.pos).applyMatrix4(globe.matrixWorld);if(v3.dot(camDir.copy(gCam.position).sub(v3))<=0)return;const d=ray.ray.distanceToPoint(v3)-(u.open?0.004:0);if(d<bd){bd=d;best=u}});
+  if(!best)return;if(best.open)go(best.id);else{sel=best;renderList();openClaim(best)}}
+(function(){const s=$("stick"),k=$("knob");let id=null;
+  function set(e){const r=s.getBoundingClientRect();let x=(e.clientX-r.left-r.width/2)/(r.width/2),y=(e.clientY-r.top-r.height/2)/(r.height/2);const l=Math.hypot(x,y);if(l>1){x/=l;y/=l}stick.x=x;stick.y=y;k.style.transform="translate("+x*36+"px,"+y*36+"px)"}
+  s.addEventListener("pointerdown",e=>{id=e.pointerId;try{s.setPointerCapture(id)}catch(_){}set(e)});
+  s.addEventListener("pointermove",e=>{if(e.pointerId===id)set(e)});
+  const end=e=>{if(e.pointerId!==id)return;id=null;stick.x=stick.y=0;k.style.transform=""};
+  s.addEventListener("pointerup",end);s.addEventListener("pointercancel",end)})();
+
+/* ---------- views ---------- */
+function setView(v,id){
+  if(cur)cur.labs.forEach(l=>l.el.style.display="none");
+  if(v==="campus"&&renderer){if(!built[id])built[id]=buildCampus(id);cur=built[id];
+    me.x=cur.start.x;me.z=cur.start.z;me.yaw=cur.start.yaw;me.pitch=0;air.dist=Math.max(160,cur.C.ext*1.4);air.az=0.9;air.el=0.75;
+    cur.labs.forEach(l=>l.el.style.display="")}
+  else{v="globe";cur=null}
+  view=v;document.body.className=v;
+  $("panel").hidden=v!=="globe";$("back").hidden=v!=="campus";$("modeSeg").hidden=v!=="campus";$("hud").hidden=v!=="campus";
+  if(renderer)UNIS.forEach(u=>u.el.style.display=v==="globe"?"":"none");
+  applyText();
+  if(v==="campus"&&id!=="hufs")setTimeout(()=>{if(cur&&cur.C.id===id)toast(t("improve"))},1200);
+}
+function setMode(m){mode=m;$("mWalk").setAttribute("aria-pressed",String(m==="walk"));$("mAir").setAttribute("aria-pressed",String(m==="air"));$("stick").style.display=m==="walk"&&coarse?"":"none";applyText()}
+function readHash(){const h=(location.hash||"").slice(1);return CD[h]?h:null}
+function go(id){try{location.hash=id||"globe"}catch(e){}const c=id&&CD[id]?id:null;setView(c?"campus":"globe",c)}
+addEventListener("hashchange",()=>{const h=readHash();if((h||null)!==(cur?cur.C.id:null))setView(h?"campus":"globe",h)});
+$("back").onclick=()=>go(null);$("mWalk").onclick=()=>setMode("walk");$("mAir").onclick=()=>setMode("air");
+document.querySelectorAll("#langSeg button").forEach(b=>b.onclick=()=>{lang=b.dataset.l;try{localStorage.setItem("wcw-lang",lang)}catch(e){}applyText()});
+
+let claimU=null;
+function claimUrl(){return SITE.repo?SITE.repo+"/issues/new?template=claim-campus.yml":""}
+function openClaim(u){claimU=u;sel=u;$("dlgWho").textContent=u[lang][0]+" · "+u[lang][1];$("dlgWrap").hidden=false;$("dlgRepo").href=claimUrl();$("dlgRepo").hidden=!SITE.repo;$("dlgClose").focus()}
+function closeClaim(){$("dlgWrap").hidden=true;claimU=null}
+$("dlgClose").onclick=closeClaim;$("dlgWrap").addEventListener("click",e=>{if(e.target===$("dlgWrap"))closeClaim()});
+addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("dlgWrap").hidden)closeClaim()});
+
+function renderList(){
+  const q=($("uniFilter").value||"").trim().toLowerCase(),ul=$("uniList");ul.textContent="";let shown=0;
+  Object.keys(REG).forEach(rg=>{
+    const items=UNIS.filter(u=>u.reg===rg&&(!q||[u.zh,u.ko,u.en].some(a=>(a[0]+" "+a[1]).toLowerCase().indexOf(q)>=0)));if(!items.length)return;
+    items.sort((a,b)=>(b.open?1:0)-(a.open?1:0));
+    const hd=document.createElement("li");hd.className="reg";hd.textContent=REG[rg][li(lang)]+" · "+items.length;ul.appendChild(hd);
+    items.forEach(u=>{shown++;const l=document.createElement("li");l.className="uni"+(u.open?" open":"")+(u===sel?" sel":"");
+      const n=document.createElement("button");n.className="n";n.type="button";const b=document.createElement("b");b.textContent=u[lang][0];const s=document.createElement("span");s.textContent=u[lang][1];n.appendChild(b);n.appendChild(s);n.onclick=()=>focusUni(u);l.appendChild(n);
+      const bt=document.createElement("button");bt.type="button";
+      if(u.open){bt.className="btn primary";bt.textContent=t("enter");bt.onclick=()=>go(u.id)}
+      else{bt.className="pill";bt.textContent=t("claim");bt.onclick=()=>openClaim(u)}
+      l.appendChild(bt);ul.appendChild(l)})});
+  if(!shown){const l=document.createElement("li");l.className="reg";l.textContent=t("none");ul.appendChild(l)}
+  $("count").textContent=t("count").replace("{n}",UNIS.length).replace("{o}",UNIS.filter(u=>u.open).length);
+}
+$("uniFilter").addEventListener("input",renderList);
+
+function applyText(){
+  document.documentElement.lang=lang==="zh"?"zh":lang;
+  document.querySelectorAll("[data-t]").forEach(e=>e.textContent=t(e.dataset.t));
+  document.querySelectorAll("#langSeg button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.l===lang)));
+  const cu=cur?uniById(cur.C.id):null;
+  $("title").textContent=cu?cu[lang][0]:t("title");
+  $("hintText").textContent=mode==="air"?t("hintAir"):(coarse?t("hintTouch"):t("hintWalk"));
+  $("by").textContent=cu&&cu.id!=="hufs"?t("byOsm"):"";
+  $("uniFilter").placeholder=t("find");$("uniFilter").setAttribute("aria-label",t("find"));
+  if(renderer)UNIS.forEach(u=>u.el.textContent=u[lang][0]);
+  renderList();
+  const fo=$("founder");fo.textContent="";const fb=document.createElement("b");fb.textContent=t("founder")+": "+SITE.founder;fo.appendChild(fb);
+  fo.appendChild(document.createTextNode(" · 2026 · "+t("indep")+" "));
+  if(SITE.repo){const a=document.createElement("a");a.href=SITE.repo;a.target="_blank";a.rel="noopener";a.textContent="GitHub";fo.appendChild(a)}
+  if(claimU)$("dlgWho").textContent=claimU[lang][0]+" · "+claimU[lang][1];
+  if(cur)cur.labs.forEach(l=>l.el.textContent=bname(l.b));
+}
+
+/* ---------- loop ---------- */
+let last=performance.now(),cw=0,ch=0,nearT=0;
+function place(el,v,cam,show){if(!show){el.style.visibility="hidden";return}v3.copy(v).project(cam);if(v3.z>1||Math.abs(v3.x)>1.1||Math.abs(v3.y)>1.1){el.style.visibility="hidden";return}
+  el.style.visibility="visible";el.style.transform="translate(-50%,-130%) translate("+((v3.x+1)/2*cw).toFixed(1)+"px,"+((1-v3.y)/2*ch).toFixed(1)+"px)"}
+function frame(now){
+  requestAnimationFrame(frame);
+  const dt=Math.min(0.05,(now-last)/1000);last=now;
+  const w=canvas.clientWidth,h=canvas.clientHeight;
+  if(w!==cw||h!==ch){cw=w;ch=h;renderer.setPixelRatio(Math.min(2,devicePixelRatio||1));renderer.setSize(w,h,false);gCam.aspect=cCam.aspect=w/h;gCam.updateProjectionMatrix();cCam.updateProjectionMatrix()}
+  if(view==="globe"){
+    if(spin)globe.rotation.y+=dt*0.05;
+    if(tgt){let dy=tgt.y-globe.rotation.y;dy=Math.atan2(Math.sin(dy),Math.cos(dy));const dx=tgt.x-globe.rotation.x,k=reduceMotion?1:Math.min(1,dt*5);globe.rotation.y+=dy*k;globe.rotation.x+=dx*k;if(Math.abs(dy)+Math.abs(dx)<0.002)tgt=null}
+    globe.updateMatrixWorld();
+    const vis=[];
+    UNIS.forEach(u=>{u.w=u.w||new THREE.Vector3();u.w.copy(u.pos).applyMatrix4(globe.matrixWorld);v3.copy(u.w).normalize();const facing=v3.dot(camDir.copy(gCam.position).sub(u.w).normalize())>0.15;
+      u.show=false;u.el.className="lab"+(u===sel?" sel":u.open?" open":"");
+      if(facing){v3.copy(u.w).project(gCam);u.sc=Math.hypot(v3.x,v3.y);if(u===sel)u.show=true;else if(u.sc<0.55)vis.push(u)}});
+    vis.sort((a,b)=>(b.open?1:0)-(a.open?1:0)||a.sc-b.sc).slice(0,8).forEach(u=>u.show=true);
+    UNIS.forEach(u=>place(u.el,u.w,gCam,u.show));
+    renderer.render(gScene,gCam);
+  }else if(cur){
+    const C=cur.C;
+    if(mode==="walk"){
+      let f=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0)-stick.y,s=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0)+stick.x;
+      const l=Math.hypot(f,s);if(l>1){f/=l;s/=l}
+      const sp=(keys.ShiftLeft||keys.ShiftRight?16:6.5)*dt;
+      const fx=Math.sin(me.yaw),fz=-Math.cos(me.yaw);
+      const dx=(fx*f-fz*s)*sp,dz=(fz*f+fx*s)*sp;
+      if(dx||dz){const inside=blockedIn(C,me.x,me.z);let nx=me.x+dx,nz=me.z+dz;
+        if(!inside&&blockedIn(C,nx,nz)){if(!blockedIn(C,nx,me.z))nz=me.z;else if(!blockedIn(C,me.x,nz))nx=me.x;else{nx=me.x;nz=me.z}}
+        const E=C.ext+40;me.x=Math.max(-E,Math.min(E,nx));me.z=Math.max(-E,Math.min(E,nz))}
+      cCam.position.set(me.x,1.7,me.z);cCam.rotation.set(-me.pitch,-me.yaw,0,"YXZ");
+    }else{
+      cCam.position.set(air.dist*Math.cos(air.el)*Math.sin(air.az),air.dist*Math.sin(air.el),air.dist*Math.cos(air.el)*Math.cos(air.az));cCam.rotation.order="XYZ";cCam.lookAt(0,10,0);
+    }
+    cCam.updateMatrixWorld();
+    if(mode==="walk"){
+      const near=cur.labs.map(l=>({l,d:Math.hypot(l.b.cx-me.x,l.b.cz-me.z)})).filter(o=>o.d<140).sort((a,b)=>a.d-b.d).slice(0,10);
+      const on=new Set(near.map(o=>o.l));cur.labs.forEach(l=>place(l.el,l.v,cCam,on.has(l)));
+      if(now-nearT>400){nearT=now;const o=near[0];$("near").textContent=o&&o.d<110?t("near")+bname(o.l.b)+" · "+Math.round(o.d)+" m":""}
+    }else{cur.labs.forEach(l=>place(l.el,l.v,cCam,!!l.big));if(now-nearT>400){nearT=now;$("near").textContent=""}}
+    renderer.render(cur.S,cCam);
+  }
+}
+setMode("walk");
+(function(){const h=readHash();setView(h?"campus":"globe",h)})();
+if(renderer)requestAnimationFrame(frame);
+</script>
+</body>
+</html>

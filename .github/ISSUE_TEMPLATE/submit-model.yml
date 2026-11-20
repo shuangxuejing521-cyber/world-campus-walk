@@ -1,0 +1,48 @@
+name: "提交模型 · 모델 제출 · Submit a model"
+description: "Send in a finished or improved campus model. 提交完成或改进后的校园模型。"
+title: "[Model] "
+labels: ["model"]
+body:
+  - type: input
+    id: campus
+    attributes:
+      label: "Campus · 校园 · 캠퍼스"
+      description: "Link the claim issue if there is one. 如有认领 issue 请附上链接。"
+    validations:
+      required: true
+  - type: input
+    id: file
+    attributes:
+      label: "Download link to the model file · 模型文件下载链接"
+      description: "Google Drive, Dropbox, OneDrive or similar. Make sure the link is viewable by anyone."
+    validations:
+      required: true
+  - type: textarea
+    id: authors
+    attributes:
+      label: "Authors to credit · 署名 · 표기할 이름"
+      description: "One per line."
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: "Sources used · 素材来源"
+      description: "e.g. OpenStreetMap footprints, own photos, own drone survey. 例如 OpenStreetMap 轮廓、自己拍的照片。"
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: "What is modelled and what is still missing · 已完成与未完成的部分"
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: "Checklist · 检查"
+      options:
+        - label: "We read the recommendations in CONTRIBUTING.md and noted anything we could not meet. 已阅读投稿建议，做不到的地方已说明。"
+          required: true
+        - label: "No crests or trademarks, no recognisable people or number plates. 不含校徽、可辨认人物或车牌。"
+          required: true
+        - label: "We made this or have the right to use everything in it, and publish it under CC BY 4.0. 素材为自制或有权使用，同意 CC BY 4.0。"
+          required: true

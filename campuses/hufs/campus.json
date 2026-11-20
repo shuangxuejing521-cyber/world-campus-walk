@@ -1,0 +1,16 @@
+{
+  "id": "hufs",
+  "name": {
+    "zh": "韩国外国语大学 首尔校区",
+    "ko": "한국외국어대학교 서울캠퍼스",
+    "en": "Hankuk University of Foreign Studies, Seoul Campus"
+  },
+  "city": { "zh": "首尔", "ko": "서울", "en": "Seoul" },
+  "lat": 37.59702,
+  "lon": 127.05885,
+  "status": "white-box",
+  "team": null,
+  "authors": ["shuangxuejing521-cyber"],
+  "sources": ["OpenStreetMap building footprints, roads and paths; heights estimated from floor counts"],
+  "licence": "CC-BY-4.0"
+}
