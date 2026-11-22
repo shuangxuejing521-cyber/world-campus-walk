@@ -14,7 +14,7 @@ Founder: **shuangxuejing521-cyber** · founded 2026
 
 一个可以走进去的世界大学 3D 校园集。转动地球，选一所大学，以第一人称在校园里散步。
 
-- **现在能逛的**：韩国外国语大学首尔校区、庆熙大学首尔校区（白模）
+- **现在能逛的**：韩国外国语大学首尔校区示范场景（楼有门窗，路上有行人、汽车、公交和火车，点一下就能跟着走）
 - **等待认领的**：62 所大学，分布在六大洲
 - **在线体验**：https://shuangxuejing521-cyber.github.io/world-campus-walk/
 
@@ -39,7 +39,7 @@ Founder: **shuangxuejing521-cyber** · founded 2026
 
 걸어서 들어갈 수 있는 세계 대학 3D 캠퍼스 모음입니다. 지구본을 돌려 대학을 고르고, 1인칭 시점으로 캠퍼스를 산책하세요.
 
-- **지금 걸을 수 있는 곳**: 한국외국어대학교 서울캠퍼스, 경희대학교 서울캠퍼스 (화이트 모델)
+- **지금 걸을 수 있는 곳**: 한국외국어대학교 서울캠퍼스 시범 장면 (창문 있는 건물, 걷는 사람과 자동차·버스·기차, 눌러서 따라가기)
 - **맡을 팀을 기다리는 곳**: 6개 대륙 62개 대학
 - **체험하기**: https://shuangxuejing521-cyber.github.io/world-campus-walk/
 
@@ -64,7 +64,7 @@ shuangxuejing521-cyber 개인이 시작한 오픈 프로젝트이며, 여기 나
 
 A collection of the world's university campuses in 3D that you can walk into. Spin the globe, pick a university and stroll through it in first person.
 
-- **Walkable now**: Hankuk University of Foreign Studies and Kyung Hee University, Seoul campuses (white-box models)
+- **Walkable now**: a demo scene of the Hankuk University of Foreign Studies Seoul campus (buildings with windows, people, cars, buses and trains you can tap to follow)
 - **Waiting for a team**: 62 universities on six continents
 - **Try it**: https://shuangxuejing521-cyber.github.io/world-campus-walk/
 
