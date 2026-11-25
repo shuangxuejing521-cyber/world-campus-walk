@@ -349,7 +349,30 @@ function facadeTex(style){return canvasTex(128,128,(g,w,h)=>{
   if(style===0){glass(14,28,100,66);g.fillStyle="#d9d4ca";g.fillRect(62,28,4,66);g.fillRect(14,58,100,3)}
   else if(style===1){glass(30,34,68,54);g.fillStyle="#d9d4ca";g.fillRect(62,34,4,54)}
   else if(style===2){glass(8,18,112,84);g.fillStyle="#d0cbc2";g.fillRect(44,18,3,84);g.fillRect(84,18,3,84)}
-  else{glass(10,22,108,62);g.fillStyle="#e9e6df";g.fillRect(0,82,w,20);g.fillStyle="#c9c4bb";g.fillRect(0,82,w,3);g.fillStyle="rgba(0,0,0,0.08)";for(let x=4;x<w;x+=10)g.fillRect(x,86,2,16)}
+  else if(style===3){glass(10,22,108,62);g.fillStyle="#e9e6df";g.fillRect(0,82,w,20);g.fillStyle="#c9c4bb";g.fillRect(0,82,w,3);g.fillStyle="rgba(0,0,0,0.08)";for(let x=4;x<w;x+=10)g.fillRect(x,86,2,16)}
+  else if(style===4){// cream granite, tall windows between pilasters (본관, 법학관)
+    g.fillStyle="#efe7d9";g.fillRect(0,0,w,h);g.fillStyle="rgba(120,100,70,0.08)";for(let y=0;y<h;y+=32)g.fillRect(0,y,w,2);
+    g.fillStyle="#f0e8da";g.fillRect(0,0,16,h);g.fillRect(w-16,0,16,h);g.fillStyle="rgba(0,0,0,0.10)";g.fillRect(16,0,3,h);g.fillRect(w-19,0,3,h);
+    glass(44,22,40,78);g.fillStyle="#ddd3c1";g.fillRect(36,104,56,6)}
+  else if(style===5){// blue glass curtain wall (도서관)
+    const gr=g.createLinearGradient(0,0,w,h);gr.addColorStop(0,"#8fb6d6");gr.addColorStop(0.5,"#4f86b5");gr.addColorStop(1,"#3a6e9c");g.fillStyle=gr;g.fillRect(0,0,w,h);
+    g.fillStyle="rgba(255,255,255,0.18)";g.beginPath();g.moveTo(0,90);g.lineTo(70,0);g.lineTo(95,0);g.lineTo(0,120);g.fill();
+    g.fillStyle="#c9d6df";g.fillRect(0,0,w,7);g.fillRect(0,0,4,h);g.fillRect(62,0,4,h);g.fillStyle="#dfe7ec";g.fillRect(0,h-16,w,9)}
+  else if(style===6){// white panels, wide dark glass, vertical fins (사이버관)
+    g.fillStyle="#f2f2ef";g.fillRect(0,0,w,h);glass(16,16,100,84);g.fillStyle="#e2e2de";g.fillRect(0,0,12,h);g.fillStyle="rgba(0,0,0,0.12)";g.fillRect(12,0,4,h);
+    g.fillStyle="#b88a5a";g.fillRect(70,16,6,84)}
+  else if(style===7){// red-brown tile, horizontal window bands (인문과학관)
+    g.fillStyle="#b97d68";g.fillRect(0,0,w,h);g.fillStyle="rgba(0,0,0,0.07)";for(let y=0;y<h;y+=8)g.fillRect(0,y,w,1);
+    const gr=g.createLinearGradient(0,30,0,88);gr.addColorStop(0,"#7e98ab");gr.addColorStop(1,"#3a4f62");g.fillStyle="#e8ddd0";g.fillRect(0,26,w,66);g.fillStyle=gr;g.fillRect(0,30,w,58);
+    g.fillStyle="#e8ddd0";g.fillRect(0,30,4,58);g.fillRect(64,30,4,58)}
+  else if(style===8){// beige tile, punched windows (교수학습개발원, 외국어연수평가원)
+    g.fillStyle="#d8cfbf";g.fillRect(0,0,w,h);g.fillStyle="rgba(0,0,0,0.06)";for(let y=0;y<h;y+=10)g.fillRect(0,y,w,1);for(let x=0;x<w;x+=20)g.fillRect(x,0,1,h);
+    glass(20,26,88,64);g.fillStyle="#d8cfbf";g.fillRect(62,26,4,64)}
+  else if(style===9){// grey granite (사회과학관, 교수회관)
+    g.fillStyle="#b9b7b1";g.fillRect(0,0,w,h);g.fillStyle="rgba(0,0,0,0.08)";for(let y=0;y<h;y+=21)g.fillRect(0,y,w,1);for(let x=0;x<w;x+=32)g.fillRect(x,0,1,h);
+    glass(30,28,68,62)}
+  else{// white paint, dark windows (역사관, 국제관)
+    g.fillStyle="#f1f1ee";g.fillRect(0,0,w,h);glass(18,30,92,56);g.fillStyle="#f1f1ee";g.fillRect(62,30,4,56)}
 })}
 function geoFrom(pos,nor,uv,col,idx){const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.Float32BufferAttribute(pos,3));
   if(nor)g.setAttribute("normal",new THREE.Float32BufferAttribute(nor,3));if(uv)g.setAttribute("uv",new THREE.Float32BufferAttribute(uv,2));
@@ -383,8 +406,8 @@ function buildCampus(id){
   {const g=new THREE.SphereGeometry(1800,24,12),col=[],P=g.attributes.position,top=new THREE.Color(0x6fa3d6),hz=new THREE.Color(0xe6ecef),tmp=new THREE.Color();
    for(let i=0;i<P.count;i++){const y=P.getY(i)/1800;tmp.copy(hz).lerp(top,Math.pow(Math.max(0,y),0.55));col.push(tmp.r,tmp.g,tmp.b)}
    g.setAttribute("color",new THREE.Float32BufferAttribute(col,3));const m=new THREE.Mesh(g,new THREE.MeshBasicMaterial({vertexColors:true,side:THREE.BackSide,fog:false,depthWrite:false}));m.renderOrder=-1;S.add(m);C.sky=m}
-  S.add(new THREE.HemisphereLight(0xdfe9f3,0x857c6c,0.5));
-  const sun=new THREE.DirectionalLight(0xfff0d8,1.1);const sunDir=new THREE.Vector3(-0.42,0.58,0.70).normalize();
+  S.add(new THREE.HemisphereLight(0xdfe9f3,0x857c6c,0.58));
+  const sun=new THREE.DirectionalLight(0xfff0d8,1.1);const sunDir=new THREE.Vector3(0.55,0.62,0.56).normalize();
   sun.castShadow=true;const sm=coarse?1024:2048;sun.shadow.mapSize.set(sm,sm);sun.shadow.bias=-0.0004;sun.shadow.normalBias=0.4;
   sun.shadow.camera.near=10;sun.shadow.camera.far=1200;S.add(sun);S.add(sun.target);
   const inCamp=(x,z)=>inPoly(x,z,C.camp);
@@ -398,6 +421,8 @@ function buildCampus(id){
   const parks=[],woods=[],lots=[],pitches=[];
   C.A.forEach((a,i)=>{const y=0.02+Math.min(i,80)*0.0004;if(flatPoly(a.p,y,gPos,null,gCol,hexc(AC[a.k]||"#c9c3b5"))){
     if(a.k==="w")woods.push(a);else if(a.k==="g"||a.k==="k"||a.k==="f")parks.push(a);else if(a.k==="p")lots.push(a);else if(a.k==="s")pitches.push(a)}});
+  pitches.forEach(a=>{if(Math.abs(polyArea(a.p))<4000)return;const c=[0,0];a.p.forEach(q=>{c[0]+=q[0]/a.p.length;c[1]+=q[1]/a.p.length});
+    flatPoly(a.p,0.043,gPos,null,gCol,hexc("#a9573f"));flatPoly(a.p.map(q=>[c[0]+(q[0]-c[0])*0.92,c[1]+(q[1]-c[1])*0.88]),0.046,gPos,null,gCol,hexc("#4f9a4a"));a.inset=0.85});
   const ground=new THREE.Mesh(geoFrom(gPos,null,null,gCol),new THREE.MeshLambertMaterial({vertexColors:true}));ground.receiveShadow=true;S.add(ground);
 
   // roads: sidewalks under the street, asphalt, then paint
@@ -428,7 +453,7 @@ function buildCampus(id){
         ribbon([s0,s1],0.12,0.1,mPos,mCol,WHITE,false);
         if(rnd()<0.62)parkedSpots.push([(x+x2)/2,(z+z2)/2,Math.atan2(vx,vz)+(rnd()<0.5?0:Math.PI)])}}}});
   // sports pitches: white outline inset
-  pitches.forEach(a=>{const c=[0,0];a.p.forEach(q=>{c[0]+=q[0]/a.p.length;c[1]+=q[1]/a.p.length});const ins=a.p.map(q=>[c[0]+(q[0]-c[0])*0.9,c[1]+(q[1]-c[1])*0.9]);ins.push(ins[0]);ribbon(ins,0.18,0.06,mPos,mCol,WHITE,1)});
+  pitches.forEach(a=>{const c=[0,0];a.p.forEach(q=>{c[0]+=q[0]/a.p.length;c[1]+=q[1]/a.p.length});const k=a.inset||0.9;const ins=a.p.map(q=>[c[0]+(q[0]-c[0])*k,c[1]+(q[1]-c[1])*(a.inset?0.83:0.9)]);ins.push(ins[0]);ribbon(ins,0.18,0.06,mPos,mCol,WHITE,1)});
   const roads=new THREE.Mesh(geoFrom(rPos,null,null,rCol),new THREE.MeshLambertMaterial({vertexColors:true}));roads.receiveShadow=true;S.add(roads);
   if(mPos.length){const mk=new THREE.Mesh(geoFrom(mPos,null,null,mCol),new THREE.MeshLambertMaterial({vertexColors:true}));mk.receiveShadow=true;S.add(mk)}
   // railway: ballast bed and two rails
@@ -436,31 +461,75 @@ function buildCampus(id){
    if(p.length){const m=new THREE.Mesh(geoFrom(p,null,null,c),new THREE.MeshLambertMaterial({vertexColors:true}));m.receiveShadow=true;S.add(m)}}
 
   // buildings: walls with window tiles, parapets and flat roofs
+  const NS=11;
   const TINTS=[["#efe7d8","#e8dcc8","#dcd3c4","#e9e2d6"],["#f1ede6","#e7d2bd","#d9b49a","#c98e74","#ece6da","#d8cbb8"],["#e6e2da","#d9d4cc","#c8c4bc","#ece4d6"],["#f3f1ec","#ebe8e1","#e8e0d2"]];
   const ROOFS=[["#9aa0a3","#a7aaa6"],["#6f9a7a","#7da486","#9b9d9b","#8a8f92","#b08a6e"],["#8f9396","#9a9c9a"],["#8b9093","#9a9fa2"]];
-  const W=[0,1,2,3].map(()=>({pos:[],nor:[],uv:[],col:[]})),par={pos:[],nor:[],col:[]},roof={pos:[],nor:[],col:[]};
-  const units=[],labs=[];
-  C.B.forEach((b,bi)=>{const st=b.style,tint=hexc(TINTS[st][(bi*7)%TINTS[st].length]),rc=hexc(ROOFS[st][(bi*3)%ROOFS[st].length]);
-    if(b.campus){tint[0]*=0.98;tint[1]*=0.92;tint[2]*=0.86}
-    const p=b.p,h=b.h,Wd=W[st];let run=0;const bay=3.6,fl=3.5,ph=b.area>40?0.9:0.4;
+  // HUFS buildings, matched to photos: facade style, height, roof colour
+  const REAL={"본관":{st:4,h:22,roof:"#cfc6b5"},"법학관":{st:4,h:31,roof:"#cfc6b5"},"도서관":{st:5,h:25,roof:"#a9b4bb"},"사이버관":{st:6,h:33,roof:"#c9cccb"},
+    "인문과학관":{st:7,h:26,roof:"#9a9d9c"},"교수학습개발원":{st:8,h:24,roof:"#a3a6a4"},"외국어연수평가원":{st:8,h:20,roof:"#a3a6a4"},"사회과학관":{st:9,h:27,roof:"#a3a6a4"},
+    "교수회관":{st:9,h:16,roof:"#a3a6a4"},"국제관":{st:10,h:24,roof:"#a7aaa8"},"역사기념관":{st:10,h:14,roof:"#b5b7b5"},"국제학사(신학생회관)":{st:8,h:30,roof:"#a3a6a4"},
+    "교수연구동":{st:9,h:18},"출판부":{st:10,h:12},"경비실":{st:9,h:7},"글로벌홀":{st:6,h:50}};
+  C.B.forEach(b=>{const r=REAL[b.name];if(r&&b.campus){b.style=r.st;b.h=r.h;b.roofC=r.roof;b.real=true}});
+  const W=[];for(let k=0;k<NS;k++)W.push({pos:[],nor:[],uv:[],col:[]});const par={pos:[],nor:[],col:[]},roof={pos:[],nor:[],col:[]};
+  const units=[],labs=[],cols=[],extra={pos:[],nor:[],col:[]};
+  // walls of a ring p between y0 and y1 with facade style st
+  const wallRing=(p,y0,y1,st,tint,ph)=>{let run=0;const bay=3.6,fl=3.5,Wd=W[st],flip=polyArea(p)>0;
     for(let i=0;i<p.length;i++){const a=p[i],c=p[(i+1)%p.length],dx=c[0]-a[0],dz=c[1]-a[1],l=Math.hypot(dx,dz);if(l<0.05)continue;
-      // outward normal: rings are stored clockwise (x east, z south), so the right-hand normal points out
-      let nx=-dz/l,nz=dx/l;if(polyArea(p)>0){nx=-nx;nz=-nz}
-      const u0=Math.round(run/bay*4)/4,u1=u0+l/bay,v1=h/fl;run+=l;
-      const quad=(y0,y1,tgt,uv,cc)=>{const v=[[a[0],y0,a[1]],[c[0],y0,c[1]],[c[0],y1,c[1]],[a[0],y1,a[1]]],uvs=[[u0,0],[u1,0],[u1,v1],[u0,v1]];
+      let nx=-dz/l,nz=dx/l;if(flip){nx=-nx;nz=-nz}
+      const u0=Math.round(run/bay*4)/4,u1=u0+l/bay,v0=y0/fl,v1=y1/fl;run+=l;
+      const quad=(ya,yb,tgt,uv,cc)=>{const v=[[a[0],ya,a[1]],[c[0],ya,c[1]],[c[0],yb,c[1]],[a[0],yb,a[1]]],uvs=[[u0,v0],[u1,v0],[u1,v1],[u0,v1]];
         [0,1,2,0,2,3].forEach(k=>{tgt.pos.push(...v[k]);tgt.nor.push(nx,0,nz);if(uv)tgt.uv.push(...uvs[k]);tgt.col.push(cc[0],cc[1],cc[2])})};
-      quad(0,h,Wd,true,tint);
-      quad(h,h+ph,par,false,[tint[0]*0.9,tint[1]*0.9,tint[2]*0.9])}
+      quad(y0,y1,Wd,true,tint);
+      if(ph>0)quad(y1,y1+ph,par,false,[tint[0]*0.9,tint[1]*0.9,tint[2]*0.9])}};
+  // a solid box (x,z centre, sizes, rotation) into the "extra" mesh
+  const boxGeo=(cx,cz,sx,sz,y0,y1,ang,c)=>{const ca=Math.cos(ang),sa=Math.sin(ang),pt=(u,v)=>[cx+u*ca-v*sa,cz+u*sa+v*ca];
+    const q=[pt(-sx/2,-sz/2),pt(sx/2,-sz/2),pt(sx/2,sz/2),pt(-sx/2,sz/2)];
+    for(let i=0;i<4;i++){const a=q[i],b=q[(i+1)%4];const dx=b[0]-a[0],dz=b[1]-a[1],l=Math.hypot(dx,dz)||1;const nx=dz/l,nz=-dx/l;
+      [[a,y0],[b,y0],[b,y1],[a,y0],[b,y1],[a,y1]].forEach(([r,y])=>{extra.pos.push(r[0],y,r[1]);extra.nor.push(nx,0,nz);extra.col.push(...c)})}
+    [[0,1,2],[0,2,3]].forEach(t=>t.forEach(k=>{extra.pos.push(q[k][0],y1,q[k][1]);extra.nor.push(0,1,0);extra.col.push(...c)}))};
+  const rectRing=(cx,cz,sx,sz,ang)=>{const ca=Math.cos(ang),sa=Math.sin(ang);return [[-1,1],[1,1],[1,-1],[-1,-1]].map(([u,v])=>[cx+u*sx/2*ca-v*sz/2*sa,cz+u*sx/2*sa+v*sz/2*ca])};
+  C.B.forEach((b,bi)=>{const st=b.style;let tint,rc;
+    if(st>=4){tint=[1,1,1];rc=hexc(b.roofC||"#a3a6a4")}else{tint=hexc(TINTS[st][(bi*7)%TINTS[st].length]);rc=hexc(ROOFS[st][(bi*3)%ROOFS[st].length]);if(b.campus){tint[0]*=0.98;tint[1]*=0.92;tint[2]*=0.86}}
+    const p=b.p,h=b.h,ph=b.area>40?(b.real?1.2:0.9):0.4;
+    wallRing(p,0,h,st,tint,ph);
     flatPoly(p,h+0.05,roof.pos,roof.nor,roof.col,rc);
-    // rooftop boxes: stair houses and AC units on bigger roofs
-    if(b.area>90){const n=b.area>600?3:b.area>250?2:1;for(let k=0;k<n*3&&units.length<1400;k++){const x=b.bb[0]+(b.bb[1]-b.bb[0])*(0.2+rnd()*0.6),z=b.bb[2]+(b.bb[3]-b.bb[2])*(0.2+rnd()*0.6);
+    if(b.name==="본관"&&b.campus)mainBuilding(b);
+    else if(b.name==="도서관"&&b.campus){// thin roof slab overhang
+      const o=b.p.map(q=>[b.cx+(q[0]-b.cx)*1.025,b.cz+(q[1]-b.cz)*1.03]);flatPoly(o,h+1.3,extra.pos,extra.nor,extra.col,hexc("#9aa3a8"))}
+    else if(b.name==="사이버관"&&b.campus){// glass entrance block at the street corner
+      boxGeo(b.cx+14,b.cz-20,10,10,0,9,0.45,hexc("#456b86"))}
+    else if(b.area>90){const n=b.area>600?3:b.area>250?2:1;for(let k=0;k<n*3&&units.length<1400;k++){const x=b.bb[0]+(b.bb[1]-b.bb[0])*(0.2+rnd()*0.6),z=b.bb[2]+(b.bb[3]-b.bb[2])*(0.2+rnd()*0.6);
       if(!inPoly(x,z,p))continue;const big=k===0&&b.area>160;units.push([x,h,z,big?3.2+rnd()*2:1.2+rnd()*0.8,big?2.6:0.9,big?3+rnd()*2:1+rnd()*0.8,rnd()*Math.PI,big?0:1]);if(units.length%3===0)break}}
-    if(b.campus&&b.name){const el=document.createElement("div");el.className="lab b";el.style.display="none";labels.appendChild(el);labs.push({b,el,v:new THREE.Vector3(b.cx,b.h+4,b.cz)})}});
-  // walls: the winding must face outward; fix by making both sides render for walls (cheap and safe)
-  const wallMats=[0,1,2,3].map(st=>new THREE.MeshLambertMaterial({map:facadeTex(st),vertexColors:true,side:THREE.DoubleSide}));
-  W.forEach((w,st)=>{if(!w.pos.length)return;const m=new THREE.Mesh(geoFrom(w.pos,w.nor,w.uv,w.col),wallMats[st]);m.castShadow=m.receiveShadow=true;S.add(m)});
+    if(b.campus&&b.name){const el=document.createElement("div");el.className="lab b";el.style.display="none";labels.appendChild(el);labs.push({b,el,v:new THREE.Vector3(b.cx,(b.top||b.h)+4,b.cz)})}});
+  // 본관: stone base, central tower with a stepped crown and a blue glass strip, giant-column portico facing the plaza (east)
+  function mainBuilding(b){
+    const tx=-82,tz=-37,ts=21,stone=[1,1,1],cream=hexc("#e9dfcd");
+    const t1=rectRing(tx,tz,ts,ts,0);wallRing(t1,b.h,50,4,stone,0);
+    const t2=rectRing(tx,tz,ts-5,ts-5,0);wallRing(t2,50,55,4,stone,0.8);
+    const t3=rectRing(tx,tz,ts-11,ts-11,0);wallRing(t3,55.8,59,10,stone,0.6);
+    [[t1,50.05],[t2,55.05],[t3,59.05]].forEach(([r,y])=>flatPoly(r,y,roof.pos,roof.nor,roof.col,hexc("#d6ccb9")));
+    boxGeo(tx+ts/2+0.15,tz,0.5,3.2,b.h+3,47,0,hexc("#6fb2de"));// glass banner strip on the tower front
+    // portico: 8 columns, entablature and pediment in front of the east face
+    const fx=-68.5,z0=-48,z1=-24,colH=17;
+    for(let k=0;k<8;k++){const z=z0+(z1-z0)*k/7;cols.push([fx+3,z,colH])}
+    boxGeo(fx+2.6,(z0+z1)/2,5.4,z1-z0+3,colH,colH+2.4,0,cream);
+    // pediment as a triangular prism
+    const pz0=z0-1.5,pz1=z1+1.5,py=colH+2.4,pk=py+4.2,px0=fx-0.2,px1=fx+5.3,pc=hexc("#efe6d6");
+    const tri=(x)=>[[x,py,pz0],[x,py,pz1],[x,pk,(pz0+pz1)/2]];const A=tri(px0),B=tri(px1);
+    const push=(v,n)=>{extra.pos.push(...v);extra.nor.push(...n);extra.col.push(...pc)};
+    B.forEach(v=>push(v,[1,0,0]));
+    const slope=(i,j)=>{const n=[0,0.94,i===0?-0.34:0.34];[A[i],B[i],B[2],A[i],B[2],A[2]].forEach(v=>push(v,n))};slope(0);slope(1);
+    // front steps
+    for(let k=0;k<4;k++)boxGeo(fx+6.5+k*0.9,(z0+z1)/2,1,z1-z0+6-k*0.8,0,0.9-k*0.22,0,hexc("#d9d2c6"));
+    b.top=59}
+  for(let st=0;st<NS;st++){const w=W[st];if(!w.pos.length)continue;const m=new THREE.Mesh(geoFrom(w.pos,w.nor,w.uv,w.col),new THREE.MeshLambertMaterial({map:facadeTex(st),vertexColors:true,side:THREE.DoubleSide}));m.castShadow=m.receiveShadow=true;S.add(m)}
   {const m=new THREE.Mesh(geoFrom(par.pos,par.nor,null,par.col),new THREE.MeshLambertMaterial({vertexColors:true,side:THREE.DoubleSide}));m.castShadow=m.receiveShadow=true;S.add(m)}
   {const m=new THREE.Mesh(geoFrom(roof.pos,roof.nor,null,roof.col),new THREE.MeshLambertMaterial({vertexColors:true,side:THREE.DoubleSide}));m.receiveShadow=true;m.castShadow=true;S.add(m)}
+  if(extra.pos.length){const m=new THREE.Mesh(geoFrom(extra.pos,extra.nor,null,extra.col),new THREE.MeshLambertMaterial({vertexColors:true,side:THREE.DoubleSide}));m.castShadow=m.receiveShadow=true;S.add(m)}
+  if(cols.length){const g=new THREE.CylinderGeometry(0.75,0.85,1,16);g.translate(0,0.5,0);const cm=new THREE.InstancedMesh(g,new THREE.MeshLambertMaterial({color:0xece3d3}),cols.length);
+    const cap=new THREE.InstancedMesh(new THREE.BoxGeometry(2.1,0.9,2.1),new THREE.MeshLambertMaterial({color:0xe6dccb}),cols.length*2);const MM=new THREE.Matrix4();
+    cols.forEach((c,i)=>{MM.makeScale(1,c[2],1);MM.setPosition(c[0],0,c[1]);cm.setMatrixAt(i,MM);MM.makeTranslation(c[0],c[2]-0.45,c[1]);cap.setMatrixAt(i*2,MM);MM.makeTranslation(c[0],0.45,c[1]);cap.setMatrixAt(i*2+1,MM)});
+    [cm,cap].forEach(m=>{m.castShadow=m.receiveShadow=true;S.add(m)})}
   const M=new THREE.Matrix4(),Q=new THREE.Quaternion(),V=new THREE.Vector3(),SC=new THREE.Vector3(),UP=new THREE.Vector3(0,1,0),COL=new THREE.Color();
   const inst=(geo,mat,n,shadow)=>{const m=new THREE.InstancedMesh(geo,mat,Math.max(1,n));m.frustumCulled=false;m.castShadow=!!shadow;m.receiveShadow=true;m.count=n;S.add(m);return m};
   const boxAt=(geo,y0)=>{geo.translate(0,y0,0);return geo};
@@ -476,7 +545,7 @@ function buildCampus(id){
       if(Math.abs(x)<C.lim&&Math.abs(z)<C.lim&&!blockedAt(x,z,1.2)&&!onRoad(x,z,0.4))trees.push([x,z,0.9+rnd()*0.25,0]);s+=9}carry=s-d}})});
   const noTree=C.A.filter(a=>"stphyrc".indexOf(a.k)>=0);
   const scatter=(poly,n,pad,kind)=>{let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9;poly.forEach(q=>{x0=Math.min(x0,q[0]);x1=Math.max(x1,q[0]);z0=Math.min(z0,q[1]);z1=Math.max(z1,q[1])});
-    for(let k=0,got=0;k<n*6&&got<n;k++){const x=x0+rnd()*(x1-x0),z=z0+rnd()*(z1-z0);if(!inPoly(x,z,poly)||blockedAt(x,z,pad)||onRoad(x,z,1)||noTree.some(a=>inPoly(x,z,a.p)))continue;trees.push([x,z,0.8+rnd()*0.6,kind]);got++}};
+    for(let k=0,got=0;k<n*6&&got<n;k++){const x=x0+rnd()*(x1-x0),z=z0+rnd()*(z1-z0);if((x>-66&&x<-18&&z>-58&&z<-14)||!inPoly(x,z,poly)||blockedAt(x,z,pad)||onRoad(x,z,1)||noTree.some(a=>inPoly(x,z,a.p)))continue;trees.push([x,z,0.8+rnd()*0.6,kind]);got++}};
   scatter(C.camp,170,2.5,1);
   woods.forEach(a=>scatter(a.p,Math.min(160,Math.abs(polyArea(a.p))/45),1,2));
   parks.forEach(a=>scatter(a.p,Math.min(40,Math.abs(polyArea(a.p))/160),1.5,1));
