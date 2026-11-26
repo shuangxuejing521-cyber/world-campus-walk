@@ -42,7 +42,7 @@ Sent from the founder's personal address. One email per university, in the unive
 
 안녕하세요.
 
-저는 한국외국어대학교 대학원 중어중문학과 박사과정생 JING SHUANGXUE(景双雪)입니다. 많은 사람이 평생 꿈꾸던 대학에 가 보지 못합니다. 그래서 가 볼 수 없는 사람도 3D 지구본 위에서 세계 여러 대학 캠퍼스를 1인칭으로 걸어 볼 수 있도록 ‘세계 캠퍼스 산책’을 시작했습니다.
+저는 한국외국어대학교 대학원 중어중문학과 박사과정생 징샹쉐(景双雪, JING SHUANGXUE)입니다. 많은 사람이 평생 꿈꾸던 대학에 가 보지 못합니다. 그래서 가 볼 수 없는 사람도 3D 지구본 위에서 세계 여러 대학 캠퍼스를 1인칭으로 걸어 볼 수 있도록 ‘세계 캠퍼스 산책’을 시작했습니다.
 
 이 프로젝트는 제가 개인적으로 시작해 자원봉사로 운영하는 비상업 프로젝트입니다. 어떤 기관으로도 등록되어 있지 않고, 예산이나 수입이 없으며, 어떤 대학과도 소속 관계가 없습니다.
 
@@ -60,7 +60,7 @@ Sent from the founder's personal address. One email per university, in the unive
 
 궁금한 점이나 의견이 있으시면 이 메일에 바로 회신해 주십시오. 감사합니다.
 
-JING SHUANGXUE(景双雪) 드림
+징샹쉐(景双雪) 드림
 한국외국어대학교 대학원 중어중문학과 박사과정
 세계 캠퍼스 산책 설립자 · shuangxuejing521@gmail.com
 
