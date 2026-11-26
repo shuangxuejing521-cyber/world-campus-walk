@@ -153,36 +153,36 @@ body.campus #credit{bottom:auto;top:60px}
 <script>
 "use strict";
 /* ---------- site settings ---------- */
-const SITE={founder:"shuangxuejing521-cyber",repo:"https://github.com/shuangxuejing521-cyber/world-campus-walk"};
+const SITE={founder:"景双雪 Jing Shuangxue",repo:"https://github.com/shuangxuejing521-cyber/world-campus-walk",mail:"shuangxuejing521@gmail.com"};
 
 /* ---------- text ---------- */
 const T={
  zh:{title:"世界校园漫游",tag:"你的校园，由你来建。让世界看见你们的水平。",back:"← 返回地球",walk:"步行",air:"俯瞰",
-  intro:"每所大学的校园都由它自己的学生来建，用什么方式建都可以。现在可以走进的是韩国外国语大学的示范场景；其他学校，等你们来建。",
-  campuses:"校园",enter:"进入",claim:"认领",find:"搜索大学或城市",none:"没有找到这所学校",count:"已收录 {n} 所，可以走进去的 {o} 所",
-  joinH:"加入你的学校",join1:"用任何方式建：手工建模、扫描、Minecraft、游戏引擎都可以",join2:"交来模型文件，最好是 GLB，其他格式我们帮忙转换",join3:"校园页面署上你们团队的名字，并以 CC BY 授权公开",
+  intro:"很多人一生都没有机会走进自己梦想中的大学。世界校园漫游想让每一个去不了的人，也能在线上走进那所校园。每所大学的校园由它自己的学生来建；现在可以走进的是韩国外国语大学的示范校园，由创始人制作。",
+  campuses:"校园",enter:"进入",claim:"认领",find:"搜索大学或城市",none:"没有找到这所学校",count:"可以走进去的 {o} 所；另有 {m} 个地点尚无团队，这些学校未参与本项目",
+  joinH:"加入你的学校",join1:"用任何方式建：手工建模、扫描、Minecraft、游戏引擎都可以",join2:"交来模型文件，最好是 GLB，其他格式我们帮忙转换",join3:"版权归你们，默认只授权本站展示，随时可以要求下架",
   hintWalk:"拖动画面环顾。W A S D 或方向键行走，按住 Shift 加速。点一下行人或车辆，可以跟着它走。",hintTouch:"左下摇杆行走，拖动画面环顾。点一下行人或车辆，可以跟着它走。",hintAir:"拖动旋转，滚轮或双指缩放，W A S D 移动视角。点一下行人或车辆，可以跟着它走。",fPerson:"正在跟随一位行人",fCar:"正在跟随一辆汽车",fBus:"正在跟随一辆公交车",fTrain:"正在跟随一列火车",stopF:"退出跟随",hintAirTouch:"拖动旋转，双指缩放，左下摇杆移动视角。点一下行人或车辆，可以跟着它走。",
   near:"附近：",byOsm:"白模由 OpenStreetMap 数据自动生成，等待团队认领完善。",
   credit:"建筑与道路数据 © OpenStreetMap 贡献者 · 外观、车辆和行人由程序生成，部分楼高为估算",err:"这台设备无法显示 3D 画面（WebGL 不可用）。",
-  founder:"创始人",indep:"个人发起的开放项目，与文中任何大学无官方关系。",
+  founder:"创始人",who:"韩国外国语大学中语中文系博士生",indep:"个人发起、志愿运营的非商业项目，尚未注册为机构，没有经费和收入，不放广告。与各大学无隶属关系，不代表任何机构。",rights:"权利与许可",demoBy:"示范校园：由创始人用 OpenStreetMap 数据和程序生成，外观参照实景照片，只做室外。欢迎韩外大同学组队接手完善。",
   claimH:"认领这所校园",claim1:"在 GitHub 仓库里填写“认领校园”表单，写上学校和团队。",claim2:"用你们喜欢的任何方式建模。需要的话，我们可以先给一份 OpenStreetMap 白模当起点。",claim3:"完成后提交模型文件，审核通过即上线，页面署上团队名字。",repoBtn:"去 GitHub 认领",close:"关闭",improve:"这所校园目前是自动生成的白模。想由你们的团队来完善它吗？"},
  ko:{title:"세계 캠퍼스 산책",tag:"우리 캠퍼스는 우리가 만든다. 우리 학교의 실력을 세계에 보여 주세요.",back:"← 지구본으로",walk:"걷기",air:"조감",
-  intro:"모든 캠퍼스는 그 학교 학생들이 직접 만들고, 방식은 자유입니다. 지금은 한국외국어대학교 시범 장면을 걸어 볼 수 있습니다. 다른 학교는 여러분을 기다립니다.",
-  campuses:"캠퍼스",enter:"입장",claim:"맡기",find:"대학 또는 도시 검색",none:"해당 학교를 찾지 못했습니다",count:"등록 {n}곳, 걸을 수 있는 곳 {o}곳",
-  joinH:"우리 학교 추가하기",join1:"어떤 방식이든 좋습니다: 직접 모델링, 스캔, 마인크래프트, 게임 엔진",join2:"모델 파일 제출, GLB가 가장 좋고 다른 형식은 변환을 도와드립니다",join3:"캠퍼스 페이지에 팀 이름 표시, CC BY로 공개",
+  intro:"많은 사람이 평생 꿈꾸던 대학에 가 보지 못합니다. 세계 캠퍼스 산책은 가 볼 수 없는 누구라도 온라인으로 그 캠퍼스에 들어갈 수 있게 하려 합니다. 모든 캠퍼스는 그 학교 학생들이 직접 만들며, 지금은 설립자가 만든 한국외국어대학교 시범 캠퍼스를 걸어 볼 수 있습니다.",
+  campuses:"캠퍼스",enter:"입장",claim:"맡기",find:"대학 또는 도시 검색",none:"해당 학교를 찾지 못했습니다",count:"걸을 수 있는 곳 {o}곳 · 아직 팀이 없는 곳 {m}곳(이 학교들은 프로젝트에 참여하지 않았습니다)",
+  joinH:"우리 학교 추가하기",join1:"어떤 방식이든 좋습니다: 직접 모델링, 스캔, 마인크래프트, 게임 엔진",join2:"모델 파일 제출, GLB가 가장 좋고 다른 형식은 변환을 도와드립니다",join3:"저작권은 여러분에게 있고, 기본적으로 이 사이트 게시만 허락하며, 언제든 삭제 요청 가능",
   hintWalk:"화면을 끌어 둘러보세요. W A S D 또는 방향키로 걷고, Shift로 빠르게. 사람이나 차를 누르면 따라갑니다.",hintTouch:"왼쪽 아래 스틱으로 걷고, 화면을 끌어 둘러보세요. 사람이나 차를 누르면 따라갑니다.",hintAir:"끌어서 회전, 휠이나 두 손가락으로 확대, W A S D로 이동. 사람이나 차를 누르면 따라갑니다.",fPerson:"보행자를 따라가는 중",fCar:"자동차를 따라가는 중",fBus:"버스를 따라가는 중",fTrain:"기차를 따라가는 중",stopF:"그만 따라가기",hintAirTouch:"끌어서 회전, 두 손가락으로 확대, 왼쪽 아래 스틱으로 이동. 사람이나 차를 누르면 따라갑니다.",
   near:"근처: ",byOsm:"OpenStreetMap 데이터로 자동 생성한 화이트 모델입니다. 다듬어 줄 팀을 기다립니다.",
   credit:"건물·도로 데이터 © OpenStreetMap 기여자 · 외관·차량·보행자는 프로그램으로 생성, 일부 높이는 추정",err:"이 기기에서는 3D 화면을 표시할 수 없습니다 (WebGL 사용 불가).",
-  founder:"설립자",indep:"개인이 시작한 오픈 프로젝트이며, 여기 나오는 어떤 대학과도 공식 관계가 없습니다.",
+  founder:"설립자",who:"한국외국어대학교 대학원 중어중문학과 박사과정",indep:"개인이 시작해 자원봉사로 운영하는 비상업 프로젝트입니다. 기관으로 등록되어 있지 않고, 예산·수입·광고가 없습니다. 어떤 대학과도 소속 관계가 없으며 어떤 기관도 대표하지 않습니다.",rights:"권리와 이용 허락",demoBy:"시범 캠퍼스: 설립자가 OpenStreetMap 데이터와 프로그램으로 만들었고, 외관은 실제 사진을 참고했으며, 건물 외부만 만들었습니다. 한국외대 학생 팀의 참여를 환영합니다.",
   claimH:"이 캠퍼스 맡기",claim1:"GitHub 저장소에서 ‘캠퍼스 맡기’ 양식에 학교와 팀을 적어 주세요.",claim2:"원하는 방식으로 모델링하세요. 필요하면 OpenStreetMap 화이트 모델을 출발점으로 드립니다.",claim3:"완성한 모델 파일을 제출하면 검토 후 공개되고, 페이지에 팀 이름이 표시됩니다.",repoBtn:"GitHub에서 맡기",close:"닫기",improve:"이 캠퍼스는 지금 자동 생성된 화이트 모델입니다. 여러분 팀이 다듬어 보시겠어요?"},
  en:{title:"World Campus Walk",tag:"Your campus, built by you. Show the world what your university can do.",back:"← Back to globe",walk:"Walk",air:"Aerial",
-  intro:"Every campus here is built by its own students, in whatever way they choose. For now you can walk into a demo scene of HUFS; every other campus is waiting for its builders.",
-  campuses:"Campuses",enter:"Enter",claim:"Claim",find:"Search a university or city",none:"No university matches",count:"{n} listed, {o} walkable",
-  joinH:"Add your campus",join1:"Build it any way: hand modelling, scanning, Minecraft, game engines",join2:"Send the model file. GLB is best; we help convert other formats",join3:"Your team is credited on the campus page, published under CC BY",
+  intro:"Many people never get the chance to visit the university they dream of. World Campus Walk wants everyone who cannot go to be able to walk in online. Every campus is built by its own students; for now you can walk into a demonstration campus of HUFS made by the founder.",
+  campuses:"Campuses",enter:"Enter",claim:"Claim",find:"Search a university or city",none:"No university matches",count:"{o} walkable · {m} locations with no team yet (these universities do not take part in the project)",
+  joinH:"Add your campus",join1:"Build it any way: hand modelling, scanning, Minecraft, game engines",join2:"Send the model file. GLB is best; we help convert other formats",join3:"You keep the copyright; by default we may only display it here, and you can ask for removal at any time",
   hintWalk:"Drag to look around. Walk with W A S D or arrow keys, hold Shift to run. Tap a person or a car to follow it.",hintTouch:"Walk with the stick at lower left, drag to look around. Tap a person or a car to follow it.",hintAir:"Drag to rotate, scroll or pinch to zoom, W A S D to move. Tap a person or a car to follow it.",fPerson:"Following a pedestrian",fCar:"Following a car",fBus:"Following a bus",fTrain:"Following a train",stopF:"Stop following",hintAirTouch:"Drag to rotate, pinch to zoom, use the stick to move. Tap a person or a car to follow it.",
   near:"Nearby: ",byOsm:"White-box model generated from OpenStreetMap data, waiting for a team to refine it.",
   credit:"Building and road data © OpenStreetMap contributors · looks, cars and people are generated, some heights estimated",err:"This device cannot show the 3D view (WebGL unavailable).",
-  founder:"Founder",indep:"An independent open project, not officially affiliated with any university shown.",
+  founder:"Founder",who:"PhD student, Hankuk University of Foreign Studies",indep:"A non-commercial project started by an individual and run by volunteers. Not a registered organisation; no funding, income or advertising. Not affiliated with any university and does not represent any institution.",rights:"Rights and licensing",demoBy:"Demonstration campus: generated by the founder from OpenStreetMap data, facades styled after photographs, exteriors only. HUFS students are welcome to take it over.",
   claimH:"Claim this campus",claim1:"Fill in the Claim a campus form in the GitHub repository with your university and team.",claim2:"Model it any way you like. If you want one, we provide an OpenStreetMap white-box as a starting point.",claim3:"Submit the finished model file. Once reviewed it goes live with your team credited.",repoBtn:"Claim on GitHub",close:"Close",improve:"This campus is an automatically generated white-box model. Would your team like to refine it?"}
 };
 const REG={as:["亚洲","아시아","Asia"],eu:["欧洲","유럽","Europe"],na:["北美洲","북아메리카","North America"],sa:["南美洲","남아메리카","South America"],af:["非洲","아프리카","Africa"],oc:["大洋洲","오세아니아","Oceania"]};
@@ -815,7 +815,7 @@ function renderList(){
       else{bt.className="pill";bt.textContent=t("claim");bt.onclick=()=>openClaim(u)}
       l.appendChild(bt);ul.appendChild(l)})});
   if(!shown){const l=document.createElement("li");l.className="reg";l.textContent=t("none");ul.appendChild(l)}
-  $("count").textContent=t("count").replace("{n}",UNIS.length).replace("{o}",UNIS.filter(u=>u.open).length);
+  const nOpen=UNIS.filter(u=>u.open).length;$("count").textContent=t("count").replace("{o}",nOpen).replace("{m}",UNIS.length-nOpen);
 }
 $("uniFilter").addEventListener("input",renderList);
 
@@ -826,13 +826,16 @@ function applyText(){
   const cu=cur?uniById(cur.C.id):null;
   $("title").textContent=cu?cu[lang][0]:t("title");
   $("hintText").textContent=mode==="air"?t(coarse?"hintAirTouch":"hintAir"):(coarse?t("hintTouch"):t("hintWalk"));
-  $("by").textContent=cu&&cu.id!=="hufs"?t("byOsm"):"";
+  $("by").textContent=cu?(cu.id==="hufs"?t("demoBy"):t("byOsm")):"";
   $("uniFilter").placeholder=t("find");$("uniFilter").setAttribute("aria-label",t("find"));
   if(renderer)UNIS.forEach(u=>u.el.textContent=u[lang][0]);
   renderList();
   const fo=$("founder");fo.textContent="";const fb=document.createElement("b");fb.textContent=t("founder")+": "+SITE.founder;fo.appendChild(fb);
+  fo.appendChild(document.createTextNode(", "+t("who")+" · "));
+  const ml=document.createElement("a");ml.href="mailto:"+SITE.mail;ml.textContent=SITE.mail;fo.appendChild(ml);
   fo.appendChild(document.createTextNode(" · 2026 · "+t("indep")+" "));
-  if(SITE.repo){const a=document.createElement("a");a.href=SITE.repo;a.target="_blank";a.rel="noopener";a.textContent="GitHub";fo.appendChild(a)}
+  if(SITE.repo){const r=document.createElement("a");r.href=SITE.repo+"/blob/main/RIGHTS.md";r.target="_blank";r.rel="noopener";r.textContent=t("rights");fo.appendChild(r);fo.appendChild(document.createTextNode(" · "));
+    const a=document.createElement("a");a.href=SITE.repo;a.target="_blank";a.rel="noopener";a.textContent="GitHub";fo.appendChild(a)}
   if(claimU)$("dlgWho").textContent=claimU[lang][0]+" · "+claimU[lang][1];
   if(cur)cur.labs.forEach(l=>l.el.textContent=bname(l.b));
   followText();

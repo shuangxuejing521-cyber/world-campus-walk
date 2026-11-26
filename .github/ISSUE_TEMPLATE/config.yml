@@ -1,1 +1,5 @@
 blank_issues_enabled: true
+contact_links:
+  - name: "Correction or removal request by email · 用邮件要求更正或下架 · 이메일로 수정·삭제 요청"
+    url: "https://github.com/shuangxuejing521-cyber/world-campus-walk/blob/main/RIGHTS.md"
+    about: "Universities and teams can email shuangxuejing521@gmail.com. Handled within 7 days. 学校和团队可直接发邮件，7 天内处理。"

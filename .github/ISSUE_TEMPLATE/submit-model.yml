@@ -14,7 +14,7 @@ body:
     id: file
     attributes:
       label: "Download link to the model file · 模型文件下载链接"
-      description: "Google Drive, Dropbox, OneDrive or similar. Make sure the link is viewable by anyone."
+      description: "Google Drive, Dropbox, OneDrive or similar. For display-only models you may instead email the file to shuangxuejing521@gmail.com. 选择“仅展示”的，也可以把文件发到邮箱。"
     validations:
       required: true
   - type: textarea
@@ -35,14 +35,29 @@ body:
     id: notes
     attributes:
       label: "What is modelled and what is still missing · 已完成与未完成的部分"
+  - type: dropdown
+    id: licence
+    attributes:
+      label: "Public licence · 对公众的许可 · 공개 이용 허락"
+      description: "You keep the copyright. The project only receives permission to display the model on this site. See RIGHTS.md."
+      options:
+        - "Display only, all rights reserved (default) · 仅展示，保留所有权利（默认） · 게시만, 모든 권리 보유(기본값)"
+        - "CC BY-NC 4.0"
+        - "CC BY 4.0"
+    validations:
+      required: true
   - type: checkboxes
     id: checks
     attributes:
-      label: "Checklist · 检查"
+      label: "Checklist · 检查 · 확인"
       options:
         - label: "We read the recommendations in CONTRIBUTING.md and noted anything we could not meet. 已阅读投稿建议，做不到的地方已说明。"
           required: true
-        - label: "No crests or trademarks, no recognisable people or number plates. 不含校徽、可辨认人物或车牌。"
+        - label: "No crests or trademarks, no recognisable people or number plates, no restricted areas or security installations; interiors only with the university's consent. 不含校徽、可辨认人物或车牌，不含禁止入内区域和安保设施；室内部分已取得学校同意。"
           required: true
-        - label: "We made this or have the right to use everything in it, and publish it under CC BY 4.0. 素材为自制或有权使用，同意 CC BY 4.0。"
+        - label: "We made this or have the right to use everything in it. 素材为自制或有权使用。"
+          required: true
+        - label: "We checked our university's IP policy; if the work is coursework, supervised, or used university resources, our department has consented. 已核对本校知识产权规定；属于课程作业、有老师指导或使用学校资源的，已取得院系同意。"
+          required: true
+        - label: "We grant the project a non-exclusive, revocable permission to display this model on the site, as described in RIGHTS.md. 同意按 RIGHTS.md 授予项目非独占、可撤回的本站展示许可。"
           required: true

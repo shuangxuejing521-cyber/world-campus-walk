@@ -60,10 +60,28 @@ body:
       options:
         - "Send us an OpenStreetMap white-box · 给我们一份白模"
         - "We start from scratch · 我们从零开始"
+  - type: dropdown
+    id: licence
+    attributes:
+      label: "Public licence you plan to use · 打算采用的对公众许可 · 공개 이용 허락"
+      description: "You keep the copyright either way. You can change this before submitting. See RIGHTS.md."
+      options:
+        - "Display only, all rights reserved (default) · 仅展示，保留所有权利（默认） · 게시만, 모든 권리 보유(기본값)"
+        - "CC BY-NC 4.0"
+        - "CC BY 4.0"
+    validations:
+      required: true
+  - type: input
+    id: email
+    attributes:
+      label: "Contact email (optional) · 联系邮箱（选填） · 연락 이메일 (선택)"
+      description: "Only used to contact you about this campus. Not shown on the site. 只用于联系你，不会显示在网站上。"
   - type: checkboxes
     id: agree
     attributes:
-      label: "Agreement · 确认"
+      label: "Agreement · 确认 · 확인"
       options:
-        - label: "We have read CONTRIBUTING.md and will publish our model under CC BY 4.0. 我们已阅读投稿指南，并同意以 CC BY 4.0 发布模型。"
+        - label: "We have read CONTRIBUTING.md and RIGHTS.md. 我们已阅读投稿指南和权利与许可说明。 CONTRIBUTING.md와 RIGHTS.md를 읽었습니다."
+          required: true
+        - label: "We will check our university's intellectual property policy, and get our department's consent if the work is coursework, supervised, or uses university resources. 我们会核对本校的知识产权规定；属于课程作业、有老师指导或使用学校资源的，会先取得院系同意。 학교의 지식재산권 규정을 확인하고, 수업 과제·지도 작업·학교 자원 사용 시 학과 동의를 받겠습니다."
           required: true

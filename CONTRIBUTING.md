@@ -11,7 +11,7 @@
 | 方式 | 适合谁 | 怎么做 |
 |---|---|---|
 | 表单 | 会建模、不熟悉 Git | 填“认领校园”，完成后填“提交模型”，贴上文件下载链接 |
-| Pull Request | 熟悉 Git | 在 `campuses/<学校代号>/` 下放 `model.glb` 和 `campus.json` |
+| Pull Request | 熟悉 Git，且选择了 CC 许可证 | 在 `campuses/<学校代号>/` 下放 `model.glb` 和 `campus.json`。选择“仅展示”的模型请用表单，文件不会进公开仓库 |
 
 ### 交什么文件
 
@@ -29,12 +29,21 @@
 
 - 不使用校徽、校标等商标，除非附上学校的书面同意
 - 不出现可辨认的真人、车牌或隐私信息
+- 默认只做建筑**室外**。做室内空间需取得学校同意；不建禁止入内的区域和安保设施
 - 只提交自己制作、或有权使用的素材，并写明来源
 - 建筑轮廓可以取自 OpenStreetMap，需保留署名
+- 实地拍摄、扫描和无人机飞行要遵守当地法规和校规，自行取得所需许可
 
-### 授权与署名
+### 学校的权利
 
-提交即表示你同意模型以 CC BY 4.0 发布。校园页面会写上团队名和成员名，`campus.json` 的 `authors` 里写谁，页面就署谁。
+课程作业、有老师指导、或使用了学校设备、设施、经费完成的作品，按很多学校的规定，权利可能属于学校。提交前请核对本校的知识产权规定，并取得院系同意。其他情况也建议告知学校。
+
+### 权利、许可与署名
+
+- 版权始终归你们（或按规定归学校），项目只获得在本站展示的许可，你们可以随时要求下架。
+- 对公众的许可由你们选：**仅展示（默认）**、CC BY-NC 4.0 或 CC BY 4.0。
+- 校园页面会写上团队名和成员名，`campus.json` 的 `authors` 里写谁，页面就署谁。
+- 详细条款见 [RIGHTS.md](RIGHTS.md)。
 
 ### 审核
 
@@ -53,7 +62,7 @@
 | 방법 | 대상 | 절차 |
 |---|---|---|
 | 양식 | 모델링은 하지만 Git이 낯선 분 | ‘캠퍼스 맡기’ 작성 후, 완성되면 ‘모델 제출’에 파일 링크 첨부 |
-| Pull Request | Git에 익숙한 분 | `campuses/<학교 코드>/`에 `model.glb`와 `campus.json` 추가 |
+| Pull Request | Git에 익숙하고 CC 라이선스를 고른 분 | `campuses/<학교 코드>/`에 `model.glb`와 `campus.json` 추가. ‘게시만’을 고른 모델은 양식을 쓰세요. 파일은 공개 저장소에 들어가지 않습니다 |
 
 ### 제출 파일
 
@@ -71,12 +80,21 @@
 
 - 학교의 서면 동의 없이는 교표 등 상표를 쓰지 않습니다
 - 식별 가능한 실제 인물, 차량 번호판, 개인 정보를 넣지 않습니다
+- 기본적으로 건물 **외부**만 만듭니다. 실내 공간은 학교의 동의가 필요하며, 출입이 제한된 구역과 보안 시설은 만들지 않습니다
 - 직접 만들었거나 사용 권한이 있는 자료만 제출하고 출처를 밝힙니다
 - 건물 윤곽은 OpenStreetMap에서 가져올 수 있으며 저작자 표시를 유지합니다
+- 현장 촬영, 스캔, 드론 비행은 현지 법규와 학칙을 지키고, 필요한 허가는 직접 받으세요
 
-### 라이선스와 표기
+### 학교의 권리
 
-제출하면 모델을 CC BY 4.0으로 공개하는 데 동의한 것으로 봅니다. `campus.json`의 `authors`에 적힌 이름이 캠퍼스 페이지에 표시됩니다.
+수업 과제, 교수 지도를 받은 작업, 학교의 장비·시설·예산을 사용한 작업은 학교 규정에 따라 권리가 학교에 있을 수 있습니다. 제출 전에 소속 학교의 지식재산권 규정을 확인하고 학과의 동의를 받아 주세요. 그 밖의 경우에도 학교에 알리기를 권합니다.
+
+### 권리, 이용 허락, 표기
+
+- 저작권은 언제나 여러분(또는 규정상 학교)에게 있습니다. 프로젝트는 이 사이트에서 게시할 허락만 받으며, 언제든 삭제를 요청할 수 있습니다.
+- 일반인에 대한 이용 허락은 여러분이 고릅니다: **게시만(기본값)**, CC BY-NC 4.0, CC BY 4.0.
+- `campus.json`의 `authors`에 적힌 이름이 캠퍼스 페이지에 표시됩니다.
+- 자세한 내용은 [RIGHTS.md](RIGHTS.md)를 보세요.
 
 ### 검토
 
@@ -95,7 +113,7 @@ Hand modelling (Blender, SketchUp, 3ds Max, Maya), phone or drone scanning (Poly
 | Way | For | How |
 |---|---|---|
 | Forms | Modellers who do not use Git | Fill in Claim a campus, then Submit a model with a download link |
-| Pull request | People comfortable with Git | Add `model.glb` and `campus.json` under `campuses/<campus-id>/` |
+| Pull request | People comfortable with Git who chose a CC licence | Add `model.glb` and `campus.json` under `campuses/<campus-id>/`. For display-only models use the forms; the file is not put in the public repository |
 
 ### What to send
 
@@ -113,12 +131,21 @@ These are **recommendations**, not entry requirements. Tell us where you can't m
 
 - No crests or other trademarks without the university's written consent
 - No recognisable real people, number plates or private information
+- Model building **exteriors** by default. Interiors need the university's consent; do not model restricted areas or security installations
 - Submit only material you made or have the right to use, and state its source
 - Building footprints may come from OpenStreetMap, with attribution kept
+- Follow local law and campus rules when photographing, scanning or flying drones, and obtain any permits yourself
 
-### Licence and credit
+### Your university's rights
 
-By submitting you agree to publish the model under CC BY 4.0. The names in `authors` in `campus.json` are the names shown on the campus page.
+Under many universities' policies, work done as coursework, under staff supervision, or with university equipment, facilities or funds may belong to the university. Before submitting, check your university's intellectual property policy and get your department's consent. In other cases we still recommend telling your university.
+
+### Rights, licence and credit
+
+- Copyright always stays with you (or with your university, where its rules say so). The project only receives permission to display the model on this site, and you can ask for removal at any time.
+- You choose the public licence: **display only (default)**, CC BY-NC 4.0 or CC BY 4.0.
+- The names in `authors` in `campus.json` are the names shown on the campus page.
+- Full terms are in [RIGHTS.md](RIGHTS.md).
 
 ### Review
 
